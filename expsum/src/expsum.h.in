@@ -1,0 +1,193 @@
+/*
+  Types and macros.
+*/
+typedef uint64_t word_t;
+typedef int64_t sword_t;
+#define USE_DWORD %USE_DWORD%
+#if USE_DWORD
+typedef __m128i dword_t;
+#else /* USE_DWORD */
+typedef word_t dword_t;
+#endif /* USE_DWORD */
+
+#define WORD_BITS 64
+#define WORD(A) UINT64_C(A)
+
+#if USE_GCC_INTRINSICS
+#define POPCOUNT(A) __builtin_popcountl(A)
+#else /* USE_GCC_INTRINSICS */
+#define POPCOUNT(A) _mm_popcnt_u64(A)
+#endif /* USE_GCC_INTRINSICS */
+
+#if USE_GCC_INTRINSICS
+#define WORD_PCLMUL(R, A, B) do {                                       \
+        (R) = (__builtin_ia32_pclmulqdq128((__v2di) {(A), 0}, (__v2di) {(B), 0}, 0))[0]; \
+    } while (0)
+#else /* USE_GCC_INTRINSICS */
+#define WORD_PCLMUL(R, A, B) do {                                       \
+        (R) = _mm_cvtsi128_si64(_mm_clmulepi64_si128(_mm_cvtsi64_si128(A), _mm_cvtsi64_si128(B), 0)); \
+    } while (0)
+#endif /* USE_GCC_INTRINSICS */
+
+#if USE_GCC_INTRINSICS
+#else /* USE_GCC_INTRINSICS */
+#if USE_DWORD
+#define DWORD_PCLMUL(R, A, B) do {                                       \
+        (R) = _mm_clmulepi64_si128(_mm_cvtsi64_si128(A), _mm_cvtsi64_si128(B), 0); \
+    } while (0)
+#else /* USE_DWORD */
+#define DWORD_PCLMUL WORD_PCLMUL
+#endif /* USE_DWORD */
+#endif /* USE_GCC_INTRINSICS */
+
+#if USE_DWORD
+#if USE_GCC_INTRINSICS
+#else /* USE_GCC_INTRINSICS */
+#define WORD_LP(R, A, MASK)  do {                       \
+        R = ((word_t) _mm_cvtsi128_si64(A)) & MASK;     \
+    } while (0)
+#define WORD_HP(R, A, SHIFT) do {                                       \
+        R = (((word_t) _mm_cvtsi128_si64(A)) >> (SHIFT)) | (((word_t) _mm_extract_epi64(A, 1)) << (64 - (SHIFT))); \
+    } while (0)
+#endif /* USE_GCC_INTRINSICS */
+#else /* USE_DWORD */
+#define WORD_LP(R, A, MASK) do {           \
+        R = (A) & (MASK);                  \
+    } while (0)
+#define WORD_HP(R, A, SHIFT) do {  \
+        R = (A) >> (SHIFT);        \
+    } while (0)
+#endif /* USE_DWORD */
+
+#if USE_GCC_INTRINSICS
+#else /* USE_GCC_INTRINSICS */
+#define WORD_K0MOD_SPARSE(R, A) do {                            \
+        int i;                                                  \
+        dword_t B;                                              \
+        B = _mm_cvtsi64_si128(0);                               \
+        B = _mm_alignr_epi8(B, (A), M0BS);                      \
+        B = _mm_srli_epi64(B, M0BSL);                           \
+        (A) = _mm_and_si128((A), _mm_cvtsi64_si128(K0MASK));    \
+        (A) = _mm_xor_si128((A), B);                            \
+        for (i = 0; i < FWEIGHTS[0]; i++)                       \
+        {                                                       \
+            B = _mm_slli_epi64(B, F0D[i]);                      \
+            (A) = _mm_xor_si128((A), B);                        \
+        }                                                       \
+        B = _mm_srli_epi64((A), M[0]);                          \
+        (A) = _mm_and_si128((A), _mm_cvtsi64_si128(K0MASK));    \
+        (A) = _mm_xor_si128((A), B);                            \
+        for (i = 0; i < FWEIGHTS[0]; i++)                       \
+        {                                                       \
+            B = _mm_slli_epi64(B, F0D[i]);                      \
+            (A) = _mm_xor_si128((A), B);                        \
+        }                                                       \
+        (R) = _mm_cvtsi128_si64((A));                           \
+    } while (0)
+#endif /* USE_GCC_INTRINSICS */
+
+/*
+  Extension degrees and related values:
+  . m2 is odd,
+  . m1 = 2*m2,
+  . m0 = 2*m1.
+*/
+static const int M[] = {%M%};
+static const int M0BS = %M0BS%;
+static const int M0BSL = %M0BSL%;
+static const word_t POWM1 = %POWM1%;
+static const word_t POWM1D2 = %POWM1D2%;
+static const word_t POWM2 = %POWM2%;
+static const sword_t POWM2N = -%POWM2%;
+static const word_t POWM2T2 = %POWM2T2%;
+static const word_t POWM2M2D3 = %POWM2M2D3%;
+static const word_t POWM2P1D3 = %POWM2P1D3%;
+static const word_t K1MASK = %K1MASK%;
+static const word_t K1HIGHBIT = %K1HIGHBIT%;
+static const word_t K0MASK = %K0MASK%;
+static const word_t K0HIGHBIT = %K0HIGHBIT%;
+static const word_t NECKLACES = %NECKLACES%;
+
+/*
+  Defining polynomials and related values.
+*/
+static const word_t F[] = {%F%};
+static const int FWEIGHTS[] = {%FWEIGHTS%};
+static const int F0D[] = {%F0D%};
+static const int F1D[] = {%F1D%};
+#define F0X %F0X%
+#define F1X %F1X%
+
+/*
+  Reduction routine to be used.
+*/
+#define SPARSE_MODULI %SPARSE_MODULI%
+#if SPARSE_MODULI
+#if F0X
+#define K0MOD k0mod_x
+#else /* F0X */
+#define K0MOD k0mod_intrinsics
+#endif /* F0X */
+#if F1X
+#define K1MOD k1mod_x
+#else /* F1X */
+#define K1MOD k1mod_sparse
+#endif /* F1X */
+#else
+#define K0MOD k0mod_naive
+#define K1MOD k1mod_naive
+#endif
+
+/*
+  Multiplicative generator of K1.
+*/
+static const word_t Z1 = %Z1%;
+
+/*
+  High powers of generators of K1 and K0.
+*/
+static const word_t K1HP[] = {%K1HP%};
+static const word_t K0HP[] = {%K0HP%};
+
+/*
+  Generator of (2^m1 + 1)-th roots of unity in K0 and related values:
+  . t1 = z0^(2^m1 - 1) = %t1%
+  . t1^-1 = %t1inv%
+  . t1^(2^m1 - 1) = t1^-2
+*/
+static const word_t T1[] = {%T1%};
+static const word_t T1INV[] = {%T1INV%};
+
+/*
+  Generator of (2^m2 + 1)-th roots of unity in K1 and related values:
+  . t2 = z1^(2^m2 - 1) = %t2%
+*/
+static const word_t T2[] = {%T2%};
+
+/*
+  Third root of unity in K1:
+  . zeta3 = z1^((2^m1 - 1)/3) = %zeta3%
+*/
+static const word_t ZETA3 = %ZETA3%;
+
+/*
+  Images of useful elements in extensions:
+  . K0(g1) = %k0g1%
+  . K0(t2) = %k0t2%
+  . K0(zeta3) = %k0zeta3%
+*/
+static const word_t K0G1[] = {%K0G1%};
+static const word_t K0T2[] = {%K0T2%};
+static const word_t K0ZETA3 = %K0ZETA3%;
+
+/*
+  Traces of power basis elements of K0:
+  . %TR%
+*/
+static const word_t K0TRACES = %K0TRACES%;
+
+/*
+  GF(4)-traces of power basis elements of K1:
+  . %GF4TR%
+*/
+static const word_t K1GF4TRACES[] = {%K1GF4TRACES%};

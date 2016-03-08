@@ -1,0 +1,2523 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <time.h>
+
+#include <smmintrin.h>
+#include <wmmintrin.h>
+
+#include <pari/pari.h>
+#include <pari/paripriv.h>
+
+#include <config.h>
+
+#include "expsum.h"
+
+#if USE_THREADS
+#include <pthread.h>
+
+typedef struct {
+    word_t a;
+    sword_t kspow;
+    sword_t kspowplus;
+} data_t;
+
+static data_t data;
+#else
+#define NB_THREADS 1
+#endif
+
+/*
+  PARI variables.
+*/
+static const size_t PARI_MEM = 1<<20;
+static const unsigned long PARI_PRIMES = 1<<16;
+static const long PARI_VAR = 0;
+GEN PARI_F1;
+
+static inline
+GEN
+word_to_pari_f2x(word_t a)
+{
+    GEN z;
+    z = cgetg(3,t_VECSMALL);
+    z[1] = evalvarn(PARI_VAR);
+    z[2] = (long) a;
+    return z;
+}
+
+static inline
+GEN
+word_to_pari_ff(word_t a, GEN T)
+{
+    GEN ff;
+    ff = cgetg(5,t_FFELT);
+    ff[1] = t_FF_F2xq;
+    ff[2] = (long) word_to_pari_f2x(a);
+    ff[3] = (long) T;
+    ff[4] = (long) gen_2;
+    return ff;
+}
+
+static inline
+void
+init_pari(void)
+{
+    pari_init(PARI_MEM, PARI_PRIMES);
+    PARI_F1 = word_to_pari_f2x(F[1]);
+}
+
+static inline
+void
+close_pari(void)
+{
+    pari_close();
+}
+
+static inline
+char *
+init_necklace(int n)
+{
+    int i;
+    char *w;
+
+    w = (char *) malloc(n * sizeof(char));
+    for (i = 0; i < n; i++)
+        w[i] = 0;
+
+    return w;
+}
+
+static inline
+void
+free_necklace(char *w)
+{
+    free(w);
+}
+
+static inline
+word_t
+next_necklace(char *w, int n)
+{
+    int i, j;
+    word_t a;
+
+    do
+    {
+        i = n;
+        while (w[i - 1])
+            i--;
+        w[i - 1] = 1;
+        if (i == 1)
+            break;
+        for (j = 1; j < n - i + 1; j++)
+            w[j - 1 + i] = w[j - 1];
+    }
+    while ((n % i) != 0);
+
+    a = 0;
+    for (i = 0; i < n; i++)
+    {
+        a <<= 1;
+        a |= w[i];
+    }
+
+    return a;
+}
+
+static inline
+word_t
+k0mod_naive(dword_t a)
+{
+    word_t r;
+    word_t hp;
+    int i;
+
+    /*
+      Reduce high powers.
+    */
+    WORD_LP(r, a, K0MASK);
+    WORD_HP(hp, a, M[0]);
+    for (i = 0; i < M[0]; i++)
+    {
+#if USE_BRANCHING
+        /*
+          Branching is utterly slow.
+        */
+        if (hp & 0x1)
+            r ^= K0HP[i];
+#else
+        r ^= (K0HP[i] & (-(hp & 0x1)));
+#endif
+
+        hp >>= 1;
+    }
+
+    return r;
+}
+
+/*
+  For sparse modulus.
+  It is assumed two successive reductions are necessary.
+*/
+static inline
+word_t
+k0mod_sparse(dword_t a)
+{
+    int i;
+    word_t r;
+    word_t hp;
+
+    /*
+      Reduce high powers.
+    */
+    /*
+      First pass.
+    */
+    WORD_LP(r, a, K0MASK);
+    WORD_HP(hp, a, M[0]);
+    r ^= hp;
+    for (i = 0; i < FWEIGHTS[0]; i++)
+    {
+        r ^= (hp << F0D[i]);
+    }
+    /*
+      Second pass.
+    */
+    hp = r >> M[0];
+    r = r & K0MASK;
+    r ^= hp;
+    for (i = 0; i < FWEIGHTS[0]; i++)
+    {
+        r ^= (hp << F0D[i]);
+    }
+
+    return r;
+}
+
+/*
+  For modulus = x^m0 + x + 1.
+*/
+static inline
+word_t
+k0mod_x(dword_t a)
+{
+    word_t r;
+    word_t hp;
+
+    /*
+      Reduce high powers.
+    */
+    WORD_LP(r, a, K0MASK);
+    WORD_HP(hp, a, M[0]);
+    r ^= hp;
+    r ^= (hp << 1);
+
+    return r;
+}
+
+static inline
+word_t
+k0mod_mul(dword_t a)
+{
+    word_t r;
+
+    abort();
+
+    return r;
+}
+
+static inline
+word_t
+k0mod_intrinsics(dword_t a)
+{
+    word_t r;
+
+    WORD_K0MOD_SPARSE(r, a);
+
+    return r;
+}
+
+static inline
+dword_t
+k0mul(word_t a, word_t b)
+{
+    dword_t r;
+
+    DWORD_PCLMUL(r, a, b);
+
+    return r;
+}
+
+static inline
+word_t
+k0mulmod(word_t a, word_t b)
+{
+    dword_t dr;
+    word_t r;
+
+    dr = k0mul(a, b);
+    r = K0MOD(dr);
+
+    return r;
+}
+
+static inline
+word_t
+k0powmod(word_t a, word_t j)
+{
+    word_t e;
+    word_t r;
+
+    for (e = K0HIGHBIT; (e & j) == 0; e >>= 1)
+        ;
+
+    r = a;
+    for (e >>= 1; e != 0; e >>= 1)
+    {
+        r = k0mulmod(r, r);
+        if (e & j)
+            r = k0mulmod(r, a);
+    }
+
+    return r;
+}
+
+static inline
+word_t
+k0powmod_powm2p1d3(word_t a)
+{
+    int i;
+    word_t r;
+
+    r = k0mulmod(a, a);
+    for (i = 0; i < ((M[2]-3) >> 1); i++)
+    {
+        r = k0mulmod(r, r);
+        r = k0mulmod(r, a);
+        r = k0mulmod(r, r);
+    }
+    r = k0mulmod(r, a);
+
+    return r;
+}
+
+static inline
+word_t
+k0powmod_powm2(word_t a)
+{
+    int i;
+    word_t r;
+
+    r = a;
+    for (i = 0; i < M[2]; i++)
+    {
+        r = k0mulmod(r, r);
+    }
+
+    return r;
+}
+
+static inline
+int
+k0trace(word_t a)
+{
+    int tr;
+
+    tr = POPCOUNT(a & K0TRACES) & 0x1;
+
+    return tr;
+}
+
+static inline
+word_t
+k1mod_naive(word_t a)
+{
+    word_t r;
+    word_t hp;
+    int i;
+
+    /*
+      Reduce high powers.
+    */
+    r = a & K1MASK;
+    hp = a >> M[1];
+    for (i = 0; i < M[1]; i++)
+    {
+#if USE_BRANCHING
+        /*
+          Branching is utterly slow.
+        */
+        if (hp & 0x1)
+            r ^= K1HP[i];
+#else
+        r ^= (K1HP[i] & (-(hp & 0x1)));
+#endif
+
+        hp >>= 1;
+    }
+
+    return r;
+}
+
+/*
+  For sparse modulus.
+  It is assumed two successive reductions are necessary.
+*/
+static inline
+word_t
+k1mod_sparse(word_t a)
+{
+    int i;
+    word_t r;
+    word_t hp;
+
+    /*
+      Reduce high powers.
+    */
+    /*
+      First pass.
+    */
+    hp = a >> M[1];
+    r = a & K1MASK;
+    r ^= hp;
+    for (i = 0; i < FWEIGHTS[1]; i++)
+    {
+        r ^= (hp << F1D[i]);
+    }
+    /*
+      Second pass.
+    */
+    hp = r >> M[1];
+    r = r & K1MASK;
+    r ^= hp;
+    for (i = 0; i < FWEIGHTS[1]; i++)
+    {
+        r ^= (hp << F1D[i]);
+    }
+
+    return r;
+}
+
+/*
+  For modulus = x^m1 + x + 1.
+*/
+static inline
+word_t
+k1mod_x(word_t a)
+{
+    word_t r;
+    word_t hp;
+
+    /*
+      Reduce high powers.
+    */
+    r = a & K1MASK;
+    hp = a >> M[1];
+    r ^= hp;
+    r ^= (hp << 1);
+
+    return r;
+}
+
+static inline
+word_t
+k1mul(word_t a, word_t b)
+{
+    word_t r;
+
+    WORD_PCLMUL(r, a, b);
+
+    return r;
+}
+
+static inline
+word_t
+k1mulmod(word_t a, word_t b)
+{
+    word_t r;
+
+    /*
+      The product must fit in a word.
+    */
+    r = k1mul(a, b);
+    r = K1MOD(r);
+
+    return r;
+}
+
+static inline
+word_t
+k1powmod(word_t a, word_t j)
+{
+    word_t e;
+    word_t r;
+
+    for (e = K1HIGHBIT; (e & j) == 0; e >>= 1)
+        ;
+
+    r = a;
+    for (e >>= 1; e != 0; e >>= 1)
+    {
+        r = k1mulmod(r, r);
+        if (e & j)
+            r = k1mulmod(r, a);
+    }
+
+    return r;
+}
+
+static inline
+int
+k1gf4trace(word_t a)
+{
+    int i;
+    int tr;
+
+    tr = 0;
+    for (i = 0; i < 3; i++)
+    {
+        tr |= (POPCOUNT((a & K1GF4TRACES[i])) % 2) << i;
+    }
+    if (tr == 0x7)
+        tr = 0;
+
+    return tr;
+}
+
+static inline
+word_t
+k1lift(word_t a)
+{
+    word_t r;
+    word_t lp;
+    int i;
+
+    r = 0;
+
+    lp = a;
+    for (i = 0; i < M[1]; i++)
+    {
+#if USE_BRANCHING
+        /*
+          Branching is utterly slow.
+        */
+        if (lp & 0x1)
+            r ^= K0HP[i];
+#else
+        r ^= (K0G1[i] & (-(lp & 0x1)));
+#endif
+
+        lp >>= 1;
+    }
+
+    return r;
+}
+
+static inline
+sword_t
+kloosterman_sum(word_t a)
+{
+    sword_t t;
+    pari_sp ltop;
+
+    ltop = avma;
+    /*
+      Unfortunately, F2xq_elltrace_Harley is not exposed:
+
+    t = itos(F2xq_elltrace_Harley(word_to_pari_f2x(a), PARI_F1));
+    */
+    t = itos(F2xq_ellcard(word_to_pari_f2x(1), word_to_pari_f2x(a), PARI_F1));
+    avma = ltop;
+    t -= POWM1;
+
+    return t;
+}
+
+/*
+  Possible optimisations:
+  . the sum only depends on the cyclotomic class of a (done);
+  . the sum is the same for w_1 and w_1^-1 (done);
+  . the multiplicative character value does not depend on w_1 (not used);
+  . the multiplicative character value only depends on the cyclotomic
+  class of u_1 (only used for 1/u_1^-1);
+  . square roots can be taken everywhere (not useful).
+*/
+
+static inline
+word_t
+update_aw1(word_t aw1)
+{
+    return k0mulmod(aw1, T1[NB_THREADS]);
+}
+
+static inline
+void
+init_sums(sword_t *sums, word_t aw1, sword_t kspow, sword_t kspowplus)
+{
+    int traw1;
+
+    traw1 = k0trace(aw1);
+    if (traw1)
+    {
+        sums[0] = sums[1] = sums[2] = kspowplus;
+    }
+    else
+    {
+        sums[0] = sums[1] = sums[2] = kspow;
+    }
+
+    return;
+}
+
+#if USE_ASSEMBLY
+static inline
+void
+compute_sums(sword_t *sums, word_t aw1)
+{
+    /* Only for 9! */
+    __asm__ __volatile__ (
+        /* Initilization. */
+        "movq $1, %%rax\n\t"
+        "movq %%rax, %%xmm0\n\t"
+        "movq %%rax, %%xmm1\n\t"
+        "movq %[aw1], %%xmm2\n\t"
+        "movq %[aw1], %%xmm3\n\t"
+
+        /* Loop over u1 */
+        "movq %[POWM1D2], %%rax\n\t"
+        "loop:\n\t"
+
+        /* Multiplications. */
+        "pclmulqdq $0, %[T1], %%xmm0\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm1\n\t"
+        "pclmulqdq $0, %[T1], %%xmm2\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm3\n\t"
+
+        /* Reductions. */
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm0, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "vpsrlq %[M0], %%xmm0, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "pxor %%xmm5, %%xmm5\n\t"
+        "palignr %[M0BS], %%xmm1, %%xmm5\n\t"
+        "psrlq %[M0BSL], %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "vpsrlq %[M0], %%xmm1, %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "pxor %%xmm6, %%xmm6\n\t"
+        "palignr %[M0BS], %%xmm2, %%xmm6\n\t"
+        "psrlq %[M0BSL], %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "vpsrlq %[M0], %%xmm2, %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "pxor %%xmm7, %%xmm7\n\t"
+        "palignr %[M0BS], %%xmm3, %%xmm7\n\t"
+        "psrlq %[M0BSL], %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        "vpsrlq %[M0], %%xmm3, %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        /* Traces */
+        "movq %%xmm2, %%rbx\n\t"
+        "andq %[K0TRACES], %%rbx\n\t"
+        "popcnt %%rbx, %%rbx\n\t"
+        "andq $1, %%rbx\n\t"
+
+        "movq %%xmm3, %%rcx\n\t"
+        "andq %[K0TRACES], %%rcx\n\t"
+        "popcnt %%rcx, %%rcx\n\t"
+        "andq $1, %%rcx\n\t"
+
+        "xorq %%rbx, %%rcx\n\t"
+        "jnz difftraces\n\t"
+
+        "shlq $1, %%rbx\n\t"
+        "decq %%rbx\n\t"
+        "shlq $1, %%rbx\n\t"
+        "neg %%rbx\n\t"
+
+        "vpxor %%xmm0, %%xmm1, %%xmm5\n\t"
+
+        /* powm2p1d3 */
+        "movq %%xmm5, %%xmm6\n\t"
+        /* S */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL],%%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* E */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* powm2 */
+        "movq %%xmm6, %%xmm5\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 3 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 4 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 5 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 6 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 7 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 8 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "movq %%xmm5, %%rcx\n\t"
+        "movq %%xmm6, %%rdx\n\t"
+        "cmpq %%rcx, %%rdx\n\t"
+        "jne zeta3\n\t"
+
+        "addq %%rbx, %[SUMS0]\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3:\n\t"
+
+        "pclmulqdq $0, %[K0ZETA3], %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "movq %%xmm6, %%rdx\n\t"
+        "cmpq %%rcx, %%rdx\n\t"
+        "jne zeta3sq\n\t"
+
+        "addq %%rbx, %[SUMS1]\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3sq:\n\t"
+
+        "addq %%rbx, %[SUMS2]\n\t"
+
+        "difftraces:\n\t"
+
+        "decq %%rax\n\t"
+        "jnz loop\n\t"
+        : [SUMS0] "=m" (sums[0]), [SUMS1] "=m" (sums[1]), [SUMS2] "=m" (sums[2])
+        : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
+          [K0MASK] "mx" (K0MASK), [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
+          [POWM1D2] "i" (POWM1D2),
+          [aw1] "mr" (aw1),
+          [T1] "mx" (T1[1]), [T1INV] "mx" (T1INV[1]),
+          [K0ZETA3] "mx" (K0ZETA3)
+        : "cc",
+          "%rax", "%rbx", "%rcx", "%rdx",
+          "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7"
+        );
+}
+#else /* USE_ASSEMBLY */
+static inline
+void
+compute_sums(sword_t *sums, word_t aw1)
+{
+    word_t j;
+    word_t u1, u1inv, u1tr, u1trinv;
+    word_t s, spow, szeta;
+    int tr, trinv;
+
+    /*
+      Init loop vars.
+    */
+    u1 = 1;
+    u1inv = 1;
+    u1tr = aw1;
+    u1trinv = aw1;
+
+    /*
+      Loop over u_1.
+      The multiplicative character is the same for u_1 and u_1^-1.
+    */
+    for (j = POWM1D2; j != 0; j--)
+    {
+        /*
+          Mul by t_1^2 and t_1^-2.
+        */
+        u1 = k0mulmod(u1, T1[1]);
+        u1inv = k0mulmod(u1inv, T1INV[1]);
+        /*
+        if (k0mulmod(u1, u1inv) != 1)
+            abort();
+        */
+
+        /*
+          Mul by t_1^-2 and t_1^2.
+        */
+        u1tr = k0mulmod(u1tr, T1INV[1]);
+        u1trinv = k0mulmod(u1trinv, T1[1]);
+        /*
+          Compute traces.
+        */
+        tr = k0trace(u1tr);
+        trinv = k0trace(u1trinv);
+
+        if (tr == trinv)
+        {
+#if USE_BRANCHING
+            /*
+              Branching is utterly slow.
+            */
+            tr = (tr == 0) ? 2 : -2;
+#else
+            tr = ((-tr) << 2) + 2;
+#endif
+
+            /*
+              Sum.
+            */
+            s = u1 ^ u1inv;
+            /*
+              Powering.
+            */
+            s = k0powmod_powm2p1d3(s);
+            spow = k0powmod_powm2(s);
+
+            /*
+              Match corresponding third root of unity.
+            */
+            if (s == spow)
+            {
+                sums[0] += tr;
+            }
+            else
+            {
+                szeta = k0mulmod(s, K0ZETA3);
+                if (spow == szeta)
+                {
+                    sums[1] += tr;
+                }
+                else
+                {
+                    sums[2] += tr;
+                }
+            }
+        }
+    }
+}
+#endif /* USE_ASSEMBLY */
+
+static inline
+void
+check_sums(sword_t *sums)
+{
+    /*
+      printf("%ld, %ld, %ld, %ld\n", i, sums[0], sums[1], sums[2]);
+    */
+    if ((sums[0] != 0 && sums[0] != POWM2N) || (sums[1] != 0 && sums[1] != POWM2N) || (sums[2] != 0 && sums[2] != POWM2N))
+    {
+        printf("%ld, %ld, %ld\n", sums[0], sums[1], sums[2]);
+        abort();
+    }
+}
+
+#if USE_THREADS
+#if USE_MORE_ASSEMBLY
+static inline
+void *
+thread_compute(void *id)
+{
+    word_t i;
+    word_t aw1;
+
+    /* Loop over aw1 */
+    aw1 = k0mulmod(data.a, T1INV[*((int *) id)]);
+    i = (POWM1D2/NB_THREADS) + ((POWM1D2 % NB_THREADS) ? 1 : 0);
+
+    /* Only for 9! */
+    __asm__ __volatile__ (
+        /* IACA Magic */
+        /*
+        "movl $111, %%ebx\n\t"
+        ".byte 0x64, 0x67, 0x90\n\t"
+        */
+
+        "loopaw1:\n\t"
+        /*
+          Update a*w1^2.
+        */
+        "pclmulqdq $0, %[T1NBTHR], %[aw1]\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %[aw1], %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %[aw1]\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+
+        "vpsrlq %[M0], %[aw1], %%xmm4\n\t"
+        "pand %[K0MASK], %[aw1]\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+
+        /*
+          Init sums.
+        */
+        /* Trace of aw1 */
+        "movq %[aw1], %%r8\n\t"
+        "andq %[K0TRACES], %%r8\n\t"
+        "popcnt %%r8, %%r8\n\t"
+        "andq $1, %%r8\n\t"
+
+        "jz traw1z\n\t"
+
+        "movq %[KSPOWPLUS], %%r13\n\t"
+        "movq %[KSPOWPLUS], %%r14\n\t"
+        "movq %[KSPOWPLUS], %%r15\n\t"
+
+        "jmp traw1\n\t"
+
+        "traw1z:\n\t"
+
+        "movq %[KSPOW], %%r13\n\t"
+        "movq %[KSPOW], %%r14\n\t"
+        "movq %[KSPOW], %%r15\n\t"
+
+        "traw1:\n\t"
+
+        /* Loop over u1 */
+
+        /* Initilization. */
+        "movq $1, %%r8\n\t"
+        "movq %%r8, %%xmm0\n\t"
+        "movq %%r8, %%xmm1\n\t"
+        "movq %[aw1], %%xmm2\n\t"
+        "movq %[aw1], %%xmm3\n\t"
+
+        "movq %[POWM1D2], %%r8\n\t"
+        "loopu1:\n\t"
+
+        /* Multiplications. */
+        "pclmulqdq $0, %[T1], %%xmm0\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm1\n\t"
+        "pclmulqdq $0, %[T1], %%xmm2\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm3\n\t"
+
+        /* Reductions. */
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm0, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "vpsrlq %[M0], %%xmm0, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "pxor %%xmm5, %%xmm5\n\t"
+        "palignr %[M0BS], %%xmm1, %%xmm5\n\t"
+        "psrlq %[M0BSL], %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "vpsrlq %[M0], %%xmm1, %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "pxor %%xmm6, %%xmm6\n\t"
+        "palignr %[M0BS], %%xmm2, %%xmm6\n\t"
+        "psrlq %[M0BSL], %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "vpsrlq %[M0], %%xmm2, %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "pxor %%xmm7, %%xmm7\n\t"
+        "palignr %[M0BS], %%xmm3, %%xmm7\n\t"
+        "psrlq %[M0BSL], %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        "vpsrlq %[M0], %%xmm3, %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        /* Traces */
+        "movq %%xmm2, %%r9\n\t"
+        "andq %[K0TRACES], %%r9\n\t"
+        "popcnt %%r9, %%r9\n\t"
+        "andq $1, %%r9\n\t"
+
+        "movq %%xmm3, %%r10\n\t"
+        "andq %[K0TRACES], %%r10\n\t"
+        "popcnt %%r10, %%r10\n\t"
+        "andq $1, %%r10\n\t"
+
+        "xorq %%r9, %%r10\n\t"
+        "jnz difftraces\n\t"
+
+        "shlq $1, %%r9\n\t"
+        "decq %%r9\n\t"
+        "shlq $1, %%r9\n\t"
+        "neg %%r9\n\t"
+
+        "vpxor %%xmm0, %%xmm1, %%xmm5\n\t"
+
+        /* powm2p1d3 */
+        "movq %%xmm5, %%xmm6\n\t"
+        /* S */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL],%%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* E */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* powm2 */
+        "movq %%xmm6, %%xmm5\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 3 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 4 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 5 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 6 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 7 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 8 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "movq %%xmm5, %%r10\n\t"
+        "movq %%xmm6, %%r11\n\t"
+        "cmpq %%r10, %%r11\n\t"
+        "jne zeta3\n\t"
+
+        "addq %%r9, %%r13\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3:\n\t"
+
+        "pclmulqdq $0, %[K0ZETA3], %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "movq %%xmm6, %%r11\n\t"
+        "cmpq %%r10, %%r11\n\t"
+        "jne zeta3sq\n\t"
+
+        "addq %%r9, %%r14\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3sq:\n\t"
+
+        "addq %%r9, %%r15\n\t"
+
+        "difftraces:\n\t"
+
+        "decq %%r8\n\t"
+        "jnz loopu1\n\t"
+
+        /* Check sums */
+        "cmpq %[POWM2N], %%r13\n\t"
+        "je sums1\n\t"
+        "testq %%r13, %%r13\n\t"
+        "jnz fail\n\t"
+
+        "sums1:\n\t"
+        "cmpq %[POWM2N], %%r14\n\t"
+        "je sums2\n\t"
+        "testq %%r14, %%r14\n\t"
+        "jnz fail\n\t"
+
+        "sums2:\n\t"
+        "cmpq %[POWM2N], %%r15\n\t"
+        "je success\n\t"
+        "testq %%r15, %%r15\n\t"
+        "jz success\n\t"
+
+        "fail:\n\t"
+        "call abort\n\t"
+
+        "success:\n\t"
+
+        "decq %[i]\n\t"
+        "jnz loopaw1\n\t"
+
+        /* IACA Magic */
+        /*
+        "movl $222, %%ebx\n\t"
+        ".byte 0x64, 0x67, 0x90\n\t"
+        */
+
+        : [i] "+rm" (i),
+          [aw1] "+x" (aw1)
+
+        : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
+          [K0MASK] "mx" (K0MASK), [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
+          [POWM1D2] "i" (POWM1D2),
+          [T1] "mx" (T1[1]), [T1INV] "mx" (T1INV[1]),
+          [K0ZETA3] "mx" (K0ZETA3),
+          [KSPOWPLUS] "mr" (data.kspowplus), [KSPOW] "mr" (data.kspow),
+          [POWM2N] "mr" (POWM2N),
+          [T1NBTHR] "mx" (T1[NB_THREADS])
+        : "cc",
+          "%ebx",
+          "%r8", "%r9", "%r10", "%r11",
+          "%r13", "%r14", "%r15",
+          "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7"
+        );
+
+    pthread_exit(NULL);
+}
+#else /* USE_MORE_ASSEMBLY */
+static inline
+void *
+thread_compute(void *id)
+{
+    int i;
+    word_t aw1;
+    sword_t sums[3];
+
+    aw1 = k0mulmod(data.a, T1[*((int *) id)]);
+    i = (POWM1D2/NB_THREADS) + ((POWM1D2 % NB_THREADS) ? 1 : 0);
+
+    for (; i != 0; i--)
+    {
+        /*
+          Update a*w1^2.
+        */
+        aw1 = update_aw1(aw1);
+
+        /*
+          Compute sums.
+        */
+        init_sums(sums, aw1, data.kspow, data.kspowplus);
+        compute_sums(sums, aw1);
+        check_sums(sums);
+
+        if ((i % 1024) == 0)
+        {
+            printf(".");
+            fflush(stdout);
+        }
+    }
+
+    pthread_exit(NULL);
+}
+#endif /* USE_MORE_ASSEMBLY */
+#endif /* USE_THREADS */
+
+static inline
+void
+check_conjecture(void)
+{
+    char *w;
+    word_t e, i;
+    word_t a, b;
+    word_t aw1;
+    sword_t ks, kspow, kspowplus;
+    clock_t cputime;
+    time_t walltime;
+
+#if USE_THREADS
+    pthread_t threads[NB_THREADS];
+#else /* USE_THREADS */
+#if !(USE_MORE_ASSEMBLY)
+    sword_t sums[3];
+#endif /* ! USE_MORE_ASSEMBLY */
+#endif /* USE_THREADS */
+
+    /*
+      Loop over a.
+    */
+    w = init_necklace(M[1]);
+    e = 0;
+    do
+    {
+        /*
+          e is the exponent of a in K_1^*.
+         */
+        e = next_necklace(w, M[1]);
+        /*
+          a must be a cube.
+        */
+        if (e % 3 != 0)
+            continue;
+
+        /*
+          Compute a.
+        */
+        a = k1powmod(Z1, e);
+
+        /*
+          The GF(4)-trace of b s.t. b^3 = a must be non-zero.
+        */
+        b = k1powmod(Z1, e/3);
+        if (k1gf4trace(b) == 0)
+            continue;
+
+        /*
+          Compute K_{m_1}(a).
+        */
+        ks = kloosterman_sum(a);
+        kspow = (ks - (sword_t) POWM2T2) / 3;
+        kspowplus = kspow + POWM2M2D3;
+        /*
+          The following is always verified given the above tests:
+
+        if ((ks - 1) % 3 != 0)
+            abort();
+        */
+
+        printf("%lu, %ld, %ld, %ld\n", e, ks, kspow, kspowplus);
+        /*
+          Loop over w_1 = t1^(i+1).
+          The sum is the same for w_1 and w_1^-1.
+        */
+        aw1 = k1lift(a);
+        cputime = clock();
+        walltime = time(NULL);
+#if USE_THREADS
+        data.a = aw1;
+        data.kspow = kspow;
+        data.kspowplus = kspowplus;
+        for (i = 0; i < NB_THREADS; i++)
+        {
+            pthread_create(&(threads[i]), NULL, thread_compute, (void *) &i);
+        }
+        for (i = 0; i < NB_THREADS; i++)
+        {
+            pthread_join(threads[i], NULL);
+        }
+#else /* USE_THREADS */
+#if USE_MORE_ASSEMBLY
+    /* Loop over aw1 */
+    i = POWM1D2;
+
+    /* Only for 9! */
+    __asm__ __volatile__ (
+        "loopaw1:\n\t"
+        /*
+          Update a*w1^2.
+        */
+        "pclmulqdq $0, %[T1], %[aw1]\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %[aw1], %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %[aw1]\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+
+        "vpsrlq %[M0], %[aw1], %%xmm4\n\t"
+        "pand %[K0MASK], %[aw1]\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %[aw1]\n\t"
+
+        /*
+          Init sums.
+        */
+        /* Trace of aw1 */
+        "movq %[aw1], %%rax\n\t"
+        "andq %[K0TRACES], %%rax\n\t"
+        "popcnt %%rax, %%rax\n\t"
+        "andq $1, %%rax\n\t"
+
+        "jz traw1z\n\t"
+
+        "movq %[KSPOWPLUS], %%r13\n\t"
+        "movq %[KSPOWPLUS], %%r14\n\t"
+        "movq %[KSPOWPLUS], %%r15\n\t"
+
+        "jmp traw1\n\t"
+
+        "traw1z:\n\t"
+
+        "movq %[KSPOW], %%r13\n\t"
+        "movq %[KSPOW], %%r14\n\t"
+        "movq %[KSPOW], %%r15\n\t"
+
+        "traw1:\n\t"
+
+        /* Loop over u1 */
+
+        /* Initilization. */
+        "movq $1, %%rax\n\t"
+        "movq %%rax, %%xmm0\n\t"
+        "movq %%rax, %%xmm1\n\t"
+        "movq %[aw1], %%xmm2\n\t"
+        "movq %[aw1], %%xmm3\n\t"
+
+        "movq %[POWM1D2], %%rax\n\t"
+        "loopu1:\n\t"
+
+        /* Multiplications. */
+        "pclmulqdq $0, %[T1], %%xmm0\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm1\n\t"
+        "pclmulqdq $0, %[T1], %%xmm2\n\t"
+        "pclmulqdq $0, %[T1INV], %%xmm3\n\t"
+
+        /* Reductions. */
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm0, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "vpsrlq %[M0], %%xmm0, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm0\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm0\n\t"
+
+        "pxor %%xmm5, %%xmm5\n\t"
+        "palignr %[M0BS], %%xmm1, %%xmm5\n\t"
+        "psrlq %[M0BSL], %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "vpsrlq %[M0], %%xmm1, %%xmm5\n\t"
+        "pand %[K0MASK], %%xmm1\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+        "psllq %[F0D], %%xmm5\n\t"
+        "pxor %%xmm5, %%xmm1\n\t"
+
+        "pxor %%xmm6, %%xmm6\n\t"
+        "palignr %[M0BS], %%xmm2, %%xmm6\n\t"
+        "psrlq %[M0BSL], %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "vpsrlq %[M0], %%xmm2, %%xmm6\n\t"
+        "pand %[K0MASK], %%xmm2\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+        "psllq %[F0D], %%xmm6\n\t"
+        "pxor %%xmm6, %%xmm2\n\t"
+
+        "pxor %%xmm7, %%xmm7\n\t"
+        "palignr %[M0BS], %%xmm3, %%xmm7\n\t"
+        "psrlq %[M0BSL], %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        "vpsrlq %[M0], %%xmm3, %%xmm7\n\t"
+        "pand %[K0MASK], %%xmm3\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+        "psllq %[F0D], %%xmm7\n\t"
+        "pxor %%xmm7, %%xmm3\n\t"
+
+        /* Traces */
+        "movq %%xmm2, %%rbx\n\t"
+        "andq %[K0TRACES], %%rbx\n\t"
+        "popcnt %%rbx, %%rbx\n\t"
+        "andq $1, %%rbx\n\t"
+
+        "movq %%xmm3, %%rcx\n\t"
+        "andq %[K0TRACES], %%rcx\n\t"
+        "popcnt %%rcx, %%rcx\n\t"
+        "andq $1, %%rcx\n\t"
+
+        "xorq %%rbx, %%rcx\n\t"
+        "jnz difftraces\n\t"
+
+        "shlq $1, %%rbx\n\t"
+        "decq %%rbx\n\t"
+        "shlq $1, %%rbx\n\t"
+        "neg %%rbx\n\t"
+
+        "vpxor %%xmm0, %%xmm1, %%xmm5\n\t"
+
+        /* powm2p1d3 */
+        "movq %%xmm5, %%xmm6\n\t"
+        /* S */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL],%%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "pclmulqdq $0, %%xmm6, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* E */
+        "pclmulqdq $0, %%xmm5, %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        /* powm2 */
+        "movq %%xmm6, %%xmm5\n\t"
+
+        /* 0 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 1 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 2 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 3 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 4 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 5 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 6 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 7 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        /* 8 */
+        "pclmulqdq $0, %%xmm5, %%xmm5\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm5, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "vpsrlq %[M0], %%xmm5, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm5\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm5\n\t"
+
+        "movq %%xmm5, %%rcx\n\t"
+        "movq %%xmm6, %%rdx\n\t"
+        "cmpq %%rcx, %%rdx\n\t"
+        "jne zeta3\n\t"
+
+        "addq %%rbx, %%r13\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3:\n\t"
+
+        "pclmulqdq $0, %[K0ZETA3], %%xmm6\n\t"
+
+        "pxor %%xmm4, %%xmm4\n\t"
+        "palignr %[M0BS], %%xmm6, %%xmm4\n\t"
+        "psrlq %[M0BSL], %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "vpsrlq %[M0], %%xmm6, %%xmm4\n\t"
+        "pand %[K0MASK], %%xmm6\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+        "psllq %[F0D], %%xmm4\n\t"
+        "pxor %%xmm4, %%xmm6\n\t"
+
+        "movq %%xmm6, %%rdx\n\t"
+        "cmpq %%rcx, %%rdx\n\t"
+        "jne zeta3sq\n\t"
+
+        "addq %%rbx, %%r14\n\t"
+
+        "jmp difftraces\n\t"
+
+        "zeta3sq:\n\t"
+
+        "addq %%rbx, %%r15\n\t"
+
+        "difftraces:\n\t"
+
+        "decq %%rax\n\t"
+        "jnz loopu1\n\t"
+
+        /* Check sums */
+        "cmpq %[POWM2N], %%r13\n\t"
+        "je sums1\n\t"
+        "testq %%r13, %%r13\n\t"
+        "jnz fail\n\t"
+
+        "sums1:\n\t"
+        "cmpq %[POWM2N], %%r14\n\t"
+        "je sums2\n\t"
+        "testq %%r14, %%r14\n\t"
+        "jnz fail\n\t"
+
+        "sums2:\n\t"
+        "cmpq %[POWM2N], %%r15\n\t"
+        "je success\n\t"
+        "testq %%r15, %%r15\n\t"
+        "jz success\n\t"
+
+        "fail:\n\t"
+        "call abort\n\t"
+
+        "success:\n\t"
+
+        "decq %[i]\n\t"
+        "jnz loopaw1\n\t"
+
+        : [i] "+rm" (i),
+          [aw1] "+x" (aw1)
+
+        : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
+          [K0MASK] "mx" (K0MASK), [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
+          [POWM1D2] "i" (POWM1D2),
+          [T1] "mx" (T1[1]), [T1INV] "mx" (T1INV[1]),
+          [K0ZETA3] "mx" (K0ZETA3),
+          [KSPOWPLUS] "mr" (kspowplus), [KSPOW] "mr" (kspow),
+          [POWM2N] "mr" (POWM2N)
+        : "cc",
+          "%rax", "%rbx", "%rcx", "%rdx",
+          "%r13", "%r14", "%r15",
+          "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7"
+        );
+#else /* USE_MORE_ASSEMBLY */
+        for (i = POWM1D2; i != 0; i--)
+        {
+            /*
+              Update a*w1^2.
+            */
+            aw1 = update_aw1(aw1);
+
+            /*
+              Compute sums.
+            */
+            init_sums(sums, aw1, kspow, kspowplus);
+            compute_sums(sums, aw1);
+            check_sums(sums);
+
+            if ((i % 1024) == 0)
+            {
+                printf(".");
+                fflush(stdout);
+            }
+        }
+#endif /* USE_MORE_ASSEMBLY */
+#endif /* USE_THREADS */
+#if !(USE_MORE_ASSEMBLY)
+        printf("\n");
+#endif /* USE_MORE_ASSEMBLY */
+        printf("CPU time: %f, wall time: %ld\n", (float) (clock() - cputime) / CLOCKS_PER_SEC, time(NULL) - walltime);
+    }
+    while (e != K1MASK);
+
+    /*
+      Cleanup necklace.
+    */
+    free_necklace(w);
+}
+
+int
+main(int argc, char *argv[])
+{
+    clock_t cputime;
+    time_t walltime;
+
+    /*
+      PARI initialisation.
+    */
+    init_pari();
+
+    /*
+      Actual computations.
+    */
+    cputime = clock();
+    walltime = time(NULL);
+    check_conjecture();
+    printf("Total CPU time: %f, total wall time: %ld\n", (float) (clock() - cputime) / CLOCKS_PER_SEC, time(NULL) - walltime);
+
+    /*
+      PARI cleanup.
+    */
+    close_pari();
+
+    return 0;
+}

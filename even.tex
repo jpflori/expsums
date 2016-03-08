@@ -1,0 +1,469 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{datetime}
+\usepackage{xifthen}
+
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{verbatim}
+\usepackage{rotating}
+\usepackage{array}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\usepackage{xspace}
+\newcommand{\ie}{i.e.\@\xspace}
+\newcommand{\eg}{e.g.\@\xspace}
+\newcommand{\etal}{et al.\@\xspace}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\GF}[2][2]{\mathbb{F}_{#1^{#2}}}
+\newcommand{\T}{\mathcal{T}}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\newcommand{\card}[1]{\left| #1 \right|}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\Tr}{Tr}
+\makeatletter
+\newcommand{\tr}[3][1]{\ifthenelse{\isempty{#3}}%
+  {\Tr_{#1}^{#2}}%
+  {\Tr_{#1}^{#2}\left(#3\right)}}
+\makeatother
+\DeclareMathOperator{\wt}{wt}
+\DeclareMathOperator{\supp}{supp}
+\newcommand{\chisf}[1]{\chi \left( #1 \right)}
+\newcommand{\Wa}[1]{\widehat{\chi_{#1}}}
+\newcommand{\W}[2][]{\widehat{\chi_{#2}}^{#1}}
+\newcommand{\PS}{\mathcal{PS}}
+\newcommand{\Ffam}{\mathcal{F}}
+\newcommand{\Gfam}{\mathcal{G}}
+\newcommand{\Hfam}{\mathcal{H}}
+\newcommand{\Tfam}{\mathcal{T}}
+
+\hypersetup{pdftitle={A note on some binomial functions when $m$ is even},%
+  pdfauthor={Jean-Pierre Flori},%
+  pdfsubject={Mathematics and Cryptography},%
+  pdfcreator={Jean-Pierre Flori},%
+  pdfproducer={Jean-Pierre Flori},%
+  pdfkeywords={mathematics} {cryptography} {Boolean functions} {bent functions} {Kloosterman sums} {elliptic curves} {point counting},
+}
+
+\title{A note on the bentness of some binomial functions when $m$ is even}
+
+\author{Jean-Pierre Flori
+  \thanks{ANSSI (Agence nationale de la sécurité des systèmes d'information),
+    51, boulevard de la Tour-Maubourg,
+    75700 Paris 07 SP, France.
+    \texttt{jean-pierre.flori@ssi.gouv.fr}}
+}
+
+\date{\today~--~\currenttime}
+% \date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  This note is devoted to the computation of the Walsh spectrum of binomial Boolean functions in a family first studied by Mesnager in the case where $m$ is even, a mathematically involved case which was left open by Mesnager and later studied experimentally by Flori and Mesnager.
+  In particular, we show that bentness of such functions can be characterized by means of Kloosterman sums as in the odd case.
+\end{abstract}
+
+\noindent
+{\bf Keywords}. Boolean functions, bent functions, Walsh--Hadamard transform, exponential sums, Kloosterman sums, elliptic curves.
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+Characterizing the bentness of Boolean functions using simple and efficient criteria is a challenging problem.
+
+The most classical family of monomial functions give in polynomial is due to Dillon~\cite{MR2624542} in 1974.
+\[
+f_a(x) = \tr{n}{a x^{r(2^m-1)}} \enspace ,
+\]
+where $a \in \GF{n}$ and $r$ is co-prime with $2^m + 1$.
+Such functions are not only bent, but also hyper-bent, if and only if the Kloosterman sum associated with $a$ is equal to zero~\cite{MR2624542,DBLP:journals/tit/Leander06,DBLP:journals/tit/CharpinG08}.
+The connection between Kloosterman sums and elliptic curves~\cite{MR0308088,MR925289,MR1054286} has since permitted to look for zeros of Kloosterman sums in very efficient way~\cite{DBLP:conf/seta/Lisonek08,DBLP:journals/corr/abs-1104-3882}.
+Further results on Kloosterman sums involving $p$-adic arithmetic~\cite{MR2794931,6126036,Moloney:PHD} lead to even faster generation of zeros of Kloosterman sums and so of hyper-bent functions.
+
+Quite recently Mesnager~\cite{DBLP:journals/dcc/Mesnager11} studied the following family of binomial functions:
+\[
+f_{a,b}(x) = \tr{n}{a x^{r(2^m-1)}} + \tr{2}{b x^{\frac{2^n-1}{3}}} \enspace ,
+\]
+where $a \in \GF{n}$, $b \in \GF[4]{}^*$.
+In the case where $m$ is odd, she could prove that $f_{a,b}$ is hyper-bent iff $K_m(a) = 4$.
+In the case where $m$ is even, she could only prove that $K_m(a) = 4$ is a necessary condition for $f_{a,b}$ to be bent (note that they can not hyper-bent in this case).
+
+In a consequent work Flori, Mesnager and Cohen adapted the ideas used to efficiently find zeros of Kloosterman sums to generate value $4$ of Kloosterman sums and so hyper-bent functions in the case where $m$ is odd.
+In the case where $m$ is even, they also checked for $m$ up to $16$ that the functions associated with $a \in \GF{m}$ such that $K_m(a)$ are always bent, so providing evidence that the result proved by Mesnager in the odd case could hold in the even case, even though the techniques used in the proof are no longer applicable.
+
+In this paper, we settle the even case: when $m$ is even, $f_{a,b}$ is bent iff $K_m(a) = 4$.
+
+\section{Characterization}
+
+Let $\nu \geq 1$ the $2$-valuation of $n$.
+We denote by $m_i$ for $0 \leq i \leq \nu$ the integer $n / 2^i$, \eg $m_0 = n$ and $m_1 = m$ with the notations of the previous section.
+
+We denote the polar decomposition of $\GF{m_i}^*$ for $0 \leq i < \nu$ by $\GF{m_i}^* = U_{i+1} \times \GF{m_{i+1}}^*$.
+
+Let's start with a completely general case of a Boolean function defined on $\GF{m_0}$ by
+\[
+f_{a,b}(x) = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \enspace ,
+\]
+where $a \in \GF{m_1}$, $b \in \GF[4]{}^*$ and without any hypothesis on $m_1$.
+
+Let's now compute the Walsh--Hadamard transform of $f_{a,b}$ at $\omega \in \GF{m_0}$:
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}}} \chisf{\tr{2}{b x^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega x}} \\
+& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1} y^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+\end{align*}
+
+\subsection{Odd case}
+
+Now suppose that $m_1 \equiv 1 \pmod{2}$, that is that $m_1$ is odd, which is the case already settled by Mesnager.
+In this case, remark that $3$ divides $2^{m_1}+1$ so that $\frac{2^{m_0}-1}{3}$ can be written $\frac{2^{m_0}-1}{3} = \left( 2^{m_1}-1 \right) \frac{2^{m_1}+1}{3}$.
+Then
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{f_{a,b}(u)} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \chisf{f_{a,b}(u)} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{\omega u y}} \\
+\end{align*}
+
+If $\omega = 0$, then
+\begin{align*}
+\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_1} - 1 \right) \sum_{u \in U_1} \chisf{f_{a,b}(u)} \\
+\end{align*}
+If $\omega \neq 0$, then
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \chisf{f_{a,b}(u)} \left( \sum_{y \in \GF{m_1}} \chisf{\tr{m_0}{\omega u y}} - 1 \right) \\
+& = 1 - \sum_{u \in U_1} \chisf{f_{a,b}(u)} + \sum_{u \in U_1} \chisf{f_{a,b}(u)} \sum_{y \in \GF{m_1}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 - \sum_{u \in U_1} \chisf{f_{a,b}(u)} + \sum_{u \in U_1} \chisf{f_{a,b}(u)} \sum_{y \in \GF{m_1}} \chisf{\tr{m_1}{\tr[m_1]{m_0}{\omega u} y}} \\
+& = 1 - \sum_{u \in U_1} \chisf{f_{a,b}(u)} + 2^{m_1} \sum_{u \in U_1, \tr[m_1]{m_0}{\omega u} = 0} \chisf{f_{a,b}(u)} \\
+& = 1 - \sum_{u \in U_1} \chisf{f_{a,b}(u)} + 2^{m_1} \chisf{f_{a,b}(\omega^{\frac{2^{m_1}-1}{3}})} \\
+\end{align*}
+
+One then concludes by computing the value of
+\begin{align*}
+\sum_{u \in U_1} \chisf{f_{a,b}(u)}
+\end{align*}
+which depends on the value of $b$.
+Mesnager did it using the fact that $3$ divides $2^{m_1}+1$ and splitting the sum on $U_1$ into three sums $S_0$, $S_1$ and $S_2$.
+We recall that computation here.
+\begin{align*}
+\sum_{u \in U_1} \chisf{f_{a,b}(u)} & = \sum_{u \in U_1} \chisf{f_{a}(u)} \chisf{\tr{2}{b u^{\frac{2^{m_0}-1}{3}}}} \\
+& = \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} = 1} \chisf{f_{a}(u)} - \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} \neq 1} \chisf{f_{a}(u)} \\
+& = 2 \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} = 1} \chisf{f_{a}(u)} - \sum_{u \in U_1} \chisf{f_{a}(u)} \\
+\end{align*}
+
+The second sum is equal to
+\begin{align*}
+\sum_{u \in U_1} \chisf{f_{a}(u)} & = 1 - K_{m_1}(a) \\
+\end{align*}
+
+As far as the first one is concerned, it is enough to compute it for $b = 1$.
+Indeed, set $\beta$ to be a primitive third root of unity (which generates $\GF[4]{}^*$),
+then it takes the same value for $b = \beta$ and $b = \beta^2$,
+and the sum over these three values has just been computed.
+
+Let $\psi_3$ be a non-principal cubic character of the multiplicative group of $\GF{m_0}$.
+Then the first sum is
+\begin{align*}
+\sum_{u \in U_1, u^{\frac{2^{m_0}-1}{3}} = 1} \chisf{f_{a}(u)} & = \frac{1}{3} \sum_{u \in U_1} \chisf{f_{a}(u^3)} \\
+& = \frac{1}{3} \sum_{u \in U_1} \chisf{\tr{m_1}{a \left( u^3 + u^{-3} \right)}} \\
+& = \frac{1}{3} \sum_{u \in U_1} \chisf{\tr{m_1}{a D_3(u + u^{-1})}} \\
+& = \frac{1}{3} \left( 1 + \sum_{u \neq 1} \chisf{\tr{m_1}{a D_3(u + u^{-1})}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \T_1} \chisf{\tr{m_1}{a D_3(t)}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \chisf{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_0} \chisf{\tr{m_1}{a D_3(t)}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \chisf{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_0} \chisf{\tr{m_1}{a t}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 C_{m_1}(a, a) - K_{m_1}(a) \right) \\
+\end{align*}
+Finally, the values of $C_{m_1}(a, a)$ were computed by Carlitz~\cite{MR544577} and give the desired result.
+
+\subsection{Even case}
+
+Now suppose that $\nu > 1$, that is $m_0$ and $m_1$ are even.
+Now $3$ does not divide $2^{m_1} + 1$ but $2^{m_1}-1$, so that $\frac{2^{m_0}-1}{3} = \left( 2^{m_1} + 1 \right) \frac{2^{m_1}-1}{3}$.
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}} y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u \in U_1} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \chisf{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+\end{align*}
+
+When $\omega = 0$, we have
+\begin{align*}
+\Wa{f_{a,b}}(0) & = 1 + \sum_{u \in U_1} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \chisf{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \\
+& = 1 + \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \chisf{\tr{2}{b c}} \\
+& = 1 - \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right)
+\end{align*}
+For $f_{a,b}$ to be bent, we must have $\Wa{f_{a,b}}(0) = 2^{m_1}$  because of the Hasse--Weil bound on $K_{m_1}(a)$ which leads to $K_{m_1}(a) = 4$ as Mesnager has already shown.
+
+When $\omega \neq 0$, we only get
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*}  \chisf{\tr{2}{b (u_2 y)^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 u_2 y}} \\
+\end{align*}
+
+\subsubsection{Initial step}
+
+First suppose that $\nu = 2$, that is $m_2$ is odd and $3$ divides $2^{m_2} + 1$,
+so that $\frac{2^{m_0}-1}{3} = \left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}$.
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*}  \chisf{\tr{2}{b (u_2 y)^{(2^{m_1}+1) (2^{m_2}-1) \frac{2^{m_2}+1}{3}}}} \chisf{\tr{m_0}{\omega u_1 u_2 y}} \\
+& = 1 + \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 u_2 y}} \\
+& = 1 + \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \sum_{y \in \GF{m_2}^*} \chisf{\tr{m_0}{\omega u_1 u_2 y}} \\
+& = 1 - \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad + \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \sum_{y \in \GF{m_2}} \chisf{\tr{m_0}{\omega u_1 u_2 y}} \\
+& = 1 - \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad + 2^{m_2} \sum_{(u_1, u_2) \in U_1 \times U_2, \tr[m_2]{m_0}{u_1 u_2 \omega} = 0} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+\end{align*}
+
+Remark that the second summand is easily computed as for $\omega = 0$:
+\begin{align*}
+- \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} & = - \frac{2^{m_2}+1}{3} \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1}} \sum_{c \in \GF[4]{}^*} \chisf{\tr{2}{b c}} \\
+& = \frac{2^{m_2}+1}{3} (1 - K_{m_1}(a)) \\
+\end{align*}
+
+The difficulty lies in computing the third summand (except when $\omega = 0$ where it is nothing but a multiple of the second summand).
+Decompose $\omega \neq 0$ as $\omega = \omega_1 \omega_2 o$ with $(\omega_1, \omega_2, o) \in U_1 \times U_2 \times \GF{m_2}^*$.
+Then $\tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2 o} = \tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2} o$ and it is zero if and only if $u_1 = \omega_1^{-1}$, or $u_1 \neq \omega_1^{-1}$ and $u_2 \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \in \GF{m_2}^*$, that is $u_2$ is equal to the polar part of $\left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-1}$ which we denote by $u_2 \sim \left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-1}$.
+In particular $u_2^{\frac{2^{m_0}-1}{3}} = \left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-\frac{2^{m_0}-1}{3}}$
+Hence
+\begin{align*}
+& \sum_{(u_1, u_2) \in U_1 \times U_2, \tr[m_2]{m_0}{u_1 u_2 \omega} = 0} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+& = \chisf{f_a(\omega_1^{-1})} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad + \sum_{u_1 \neq \omega_1^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}}}} \\
+\end{align*}
+
+Then the first summand here is
+\begin{align*}
+\chisf{f_a(\omega_1^{-1})} \sum_{u_2 \in U_2} \chisf{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} & = \frac{2^{m_2}+1}{3} \chisf{f_a(\omega_1^{-1})} \sum_{c \in \GF[4]{}^*} \chisf{\tr{2}{b c}} \\
+& = \frac{2^{m_2}+1}{3} \chisf{f_a(\omega_1^{-1})} \sum_{c \in \GF[4]{}^*} \chisf{\tr{2}{c}} \\
+& = - \frac{2^{m_2}+1}{3} \chisf{f_a(\omega_1^{-1})} \\
+\end{align*}
+so we are left with the second summand.
+
+This second summand reads
+\begin{align*}
+& \sum_{u_1 \neq \omega_1^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}}}} \\
+& = \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& \qquad - \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} \neq 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& = 2 \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} - \sum_{u_1 \neq \omega_1^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+\end{align*}
+
+The second summand is
+\begin{align*}
+\sum_{u_1 \neq \omega_1^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} & = 1 - \chisf{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} + \sum_{u_1 \neq 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& = 1 - \chisf{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} + \sum_{u_1 \neq 1} \chisf{\tr{m_0}{a u_1}} \\
+& = 1 - \chisf{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} - K_{m_1}(a) \\
+\end{align*}
+
+We are left to compute
+\begin{align*}
+\sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{-2}}} \\
+\end{align*}
+Remark that
+\begin{align*}
+b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} & = b \left( \omega_2^{-1} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{-1} \right)^{\frac{2^{m_0}-1}{3}} \\
+& = b \omega_2^{-\left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{- \left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \\
+& = b \omega_2^{4 \frac{2^{m_2}+1}{3}} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{- 2 \frac{2^{m_1}-1}{3}} \\
+\end{align*}
+
+Suppose first that $\omega_1 = 1$, that is $\omega \in \GF{m_1}^*$ rather than $\omega \in \GF{m_0}^*$.
+Then the sum is
+\begin{align*}
+\sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-1}}} \\
+ & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_1}{a \left( u_1 + u_1^{-1} \right)}} \\
+& = 2 \sum_{t \in \T_1, t^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_1}{a t}} \\
+\end{align*}
+It is enough to compute it for $b \omega_2^{4 \frac{2^{m_2}+1}{3}} = 1$.
+Indeed, set $\beta$ to be a primitive third root of unity (which generates $\GF[4]{}^*$),
+then it takes the same value for $b \omega_2^{4 \frac{2^{m_2}+1}{3}} = \beta$ and $b \omega_2^{4 \frac{2^{m_2}+1}{3}} = \beta^2$ and
+\begin{align*}
+2 \sum_{t \in \T_1} \chisf{\tr{m_1}{a t}} = - K_{m_1}(a) \\
+\end{align*}
+So let us suppose that $b \omega_2^{4 \frac{2^{m_2}+1}{3}} = 1$.
+The sum becomes
+\begin{align*}
+2 \sum_{t \in \T_1, \psi_3(t) = 1} \chisf{\tr{m_1}{a t}} & = - \sum_{x \in \GF{m_1}^*, \psi_3(x) = 1} \chisf{\tr{m_1}{a x + 1/x}} + \sum_{x \in \GF{m_1}^*, \psi_3(x) = 1} \chisf{\tr{m_1}{a x}} \\
+\end{align*}
+
+This second sum was studied by Carlitz~\cite{MR544577}.
+As $m_1$ is even, we have
+\begin{align*}
+\sum_{x \in \GF{m_1}^*, \psi_3(x) = 1} \chisf{\tr{m_1}{a x}} & = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \chisf{\tr{m_1}{a x^3}} \\
+& = \frac{1}{3} C_{m_1}(a, 0) \\
+& = \left\{
+\begin{array}{ll}
+\frac{-1 + (-1)^{m_2-1} 2^{m_2+1}}{3} & \text{if } \psi_3(a) = 1 \\
+\frac{-1 + (-1)^{m_2} 2^{m_2}}{3} & \text{if } \psi_3(a) \neq 1 \\
+\end{array}
+\right. \\
+& = \left\{
+\begin{array}{ll}
+\frac{-1 + 2^{m_2+1}}{3} & \text{if } \psi_3(a) = 1 \\
+\frac{-1 - 2^{m_2}}{3} & \text{if } \psi_3(a) \neq 1 \\
+\end{array}
+\right. \\
+\end{align*}
+
+Let us now suppose that $K_{m_1}(a) \equiv 1 \pmod{3}$, which includes the case we are ultimately interested in: $K_{m_1}(a) = 4$.
+Carlitz~\cite{MR544577} showed that there exists $b \in \GF{m_1}^*$ such that $a = b^3$ (in particular $\psi_3(a) = 1$) and $\tr[2]{m_1}{b} \neq 0$ if and only if $C_{m_1}(a, a) = 0$.
+Then, Charpin \etal~\cite{4595463,DBLP:journals/dm/CharpinHZ09} deduced that $K_{m_1}(a) \equiv 1 \pmod{3}$ if and only if there exists $b \in \GF{m_1}^*$ such that $a = b^3$ and $\tr[2]{m_1}{b} \neq 0$.
+In this case the second sum is always
+\begin{align*}
+\sum_{x \in \GF{m_1}^*, \psi_3(x) = 1} \chisf{\tr{m_1}{a x}} & = \frac{-1 + 2^{m_2+1}}{3} \\
+\end{align*}
+
+Supposing again that $K_{m_1}(a) \equiv 1 \pmod{3}$, or equivalently that there exists $b,\ c \in \GF{m_1}^*$ such that $a = b^3 = c^6$ with $\tr[2]{m_1}{b} \neq 0$, we now compute the first sum as
+\begin{align*}
+\sum_{x \in \GF{m_1}^*, \psi_3(x) = 1} \chisf{\tr{m_1}{a x + 1/x}} & = \frac{\sum_{x \in \GF{m_1}^*} \chisf{\tr{m_1}{a x^3 + 1/x^3}}}{3} \\
+& = \frac{\sum_{x \in \GF{m_1}^*} \chisf{\tr{m_1}{c^6 x^3 + 1/x^3}}}{3} \\
+& = \frac{\sum_{x \in \GF{m_1}^*} \chisf{\tr{m_1}{c^3 \left( x^3 + 1/x^3 \right)}}}{3} \\
+& = \frac{\sum_{x \in \GF{m_1}^*} \chisf{\tr{m_1}{c^3 D_3(x + 1/x)}}}{3} \\
+& = \frac{2 \sum_{t \in \T_0 \setminus \set{0, 1}} \chisf{\tr{m_1}{c^3 D_3(t)}} + 1}{3} \\
+& = \frac{2 \sum_{t \in \T_0} \chisf{\tr{m_1}{c^3 D_3(t)}} - 1}{3} \\
+& = \frac{2 \left( C_{m_1}(a, a) - \sum_{t \in \T_1} \chisf{\tr{m_1}{c^3 D_3(t)}} \right) - 1}{3} \\
+& = \frac{- 2 \sum_{t \in \T_1} \chisf{\tr{m_1}{c^3 D_3(t)}} - 1}{3} \\
+& = \frac{- 2 \sum_{t \in \T_1} \chisf{\tr{m_1}{c^3 t}} - 1}{3} \\
+& = \frac{K_{m_1}(c^3) - 1}{3} \\
+& = \frac{K_{m_1}(a) - 1}{3} \\
+\end{align*}
+
+Therefore, supposing that $K_{m_1}(a) \equiv 1 \pmod{3}$, one has
+\begin{align*}
+\sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{2 \frac{2^{m_1}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{-2}}} = \frac{2^{m_2+1} - K_{m_1}(a)}{3} \\
+\end{align*}
+and so that
+\begin{align*}
+& \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
+& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \chisf{\tr{2}{b \omega_2^{4 \frac{2^{m_2}+1}{3}}}} \right) 2^{m_2-1} \\
+\end{align*}
+
+Going back to the case $\omega_1 \neq 1$, \ie $\omega \in \GF{m_0}^*$, and supposing again that $K_{m_1}(a) \equiv 1 \pmod{3}$, the following should be true
+\begin{align*}
+& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
+& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \chisf{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \chisf{\tr{m_0}{a \omega_1^2}} \right) \frac{2^{m_2-1} - 1}{3} \\
+\end{align*}
+Experimentally one remarks that there are exactly $2^{m_1 - 1} + 10 \frac{K_{m_1}(a) - 4}{12} + 2$ (respectively $2^{m_1 - 1} - 2 \frac{K_{m_1}(a) - 4}{12}$) values of $\omega_1$ such that the mysterious trace is zero when $b = 1$ (respectively $b \neq 1$) and $\omega_2 = 1$.
+
+Indeed
+\begin{align*}
+& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
+& \qquad = \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2} \omega_1^2}} \\
+& \ldots
+\end{align*}
+
+
+\subsubsection{Further steps}
+
+Let us now suppose $\nu > 2$.
+Similarly to the above case, one has
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_\nu \in U_\nu} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad + 2^{m_\nu} \sum_{(u_1, \ldots,  u_\nu) \in U_1 \times \cdots \times U_\nu, \tr[m_\nu]{m_0}{u_1 \cdots u_\nu \omega} = 0} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+\end{align*}
+
+As above, the first sum (corresponding to $y = 0$) yields
+\begin{align*}
+& - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \sum_{u_1 \in U_1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_\nu \in U_\nu} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad = \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \\
+& \qquad = \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \\
+\end{align*}
+
+As above, the second one (summing over $y \in \GF{m_\nu}$) can be decomposed into different summands.
+The first one is
+\begin{align*}
+%& \sum_{u_1 \sim \omega_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \sum_{u_1 = \omega_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad = - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \chisf{f_a(\omega_1^{-1})} \\
+& \qquad = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \chisf{f_a(\omega_1^{-1})} \\
+\end{align*}
+The second one is
+\begin{align*}
+%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, u_3 \in U_3, \ldots, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \sum_{u_1 \neq \omega_1^{-1}, \tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2} = 0, u_3 \in U_3, \ldots, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad = - \left( 2^{m_3} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
+\end{align*}
+together with similar terms
+\begin{align*}
+%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_{i} \sim \omega_{i}^{-1} \tr[m_{i-1}]{m_0}{u_1 \omega_1 \cdots u_{i-1} \omega_{i-1}}^{-1}, u_{i+1} \in U_{i+1}, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \sum_{\tr[m_{i-1}]{m_0}{u_1 \cdots u_{i-1} \omega_1 \cdots \omega_{i-1}} \neq 0, \tr[m_i]{m_0}{u_1 \cdots u_i \omega_1 \cdots \omega_i} = 0, u_{i+1} \in U_{i+1}, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad = - 2^{m_2} \cdots 2^{m_{i - 1}} \left( 2^{m_{i+1}} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
+\end{align*}
+until
+\begin{align*}
+%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_{\nu-1} \sim \omega_{\nu-1}^{-1} \tr[m_{\nu-2}]{m_0}{u_1 \omega_1 \cdots u_{\nu-2} \omega_{\nu-2}}^{-1}, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \sum_{\tr[m_{\nu-2}]{m_0}{u_1 \cdots u_{\nu-2} \omega_1 \cdots \omega_{\nu-2}} \neq 0, \tr[m_\nu-1]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} = 0, u_\nu \in U_\nu} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \qquad = - 2^{m_2} \cdots 2^{m_{\nu - 2}} \frac{2^{m_\nu} + 1}{3} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
+\end{align*}
+which sum back up to
+\begin{align*}
+& - \frac{2^{\left( 2^{\nu-2} - 1 \right) m_{\nu-1}}-1}{2^{m_{\nu-1}}-1} \frac{2^{m_\nu} + 1}{3} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad = - \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
+\end{align*}
+as an easy induction shows.
+And finally
+\begin{align*}
+%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+& \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
+\end{align*}
+
+This last sum can be splitted as
+\begin{align*}
+%& 2 \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+%& \qquad - \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& 2 \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& \qquad - \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+\end{align*}
+where the second term is
+\begin{align*}
+%& - \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& - \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0 } \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& \qquad = - 2^{m_2} \cdots 2^{m_{\nu - 1}} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+\end{align*}
+
+This leads to the following expression
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \\
+& \qquad - 2^{m_\nu} \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \chisf{f_a(\omega_1^{-1})} \\
+& \qquad - 2^{m_\nu} \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad - 2^{m_\nu} 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+%& \qquad + 2^{m_{\nu} + 1} \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& \qquad + 2^{m_{\nu} + 1} \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - 2^{m_\nu} \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad - \left( \frac{2^{\left( 2^{\nu-1} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} + 2^{\left(2^{\nu - 1} - 1\right) m_\nu} \right) \left( 1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+%& \qquad + 2^{m_{\nu} + 1} \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+& \qquad + 2^{m_{\nu} + 1} \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
+\end{align*}
+which generalizes the case $\nu = 2$.
+
+\section{Conclusion}
+
+\bibliographystyle{plain}
+\bibliography{even}
+
+\end{document}

@@ -97,31 +97,6 @@ function S12U1left(a, b, w1, w2)
     return S;
 end function;
 
-//this is the boring sum for general extensions
-function S12U1leftgen(a, b, K0, Kv)
-    ZZ := Integers();
-    n := Degree(K0);
-    m1 := ZZ!(n/2);
-    z := Generator(K0);
-    pow := ZZ!((2^n-1)/3);
-    t1 := z^(2^m1-1);
-    t1pow := t1^(2^m1-1);
-    u1 := K0!1;
-    u2 := K0!1;
-    S := 0;
-    //sum for u2 \neq 1
-    for i in [0..2^m1-1] do
-        u1 *:= t1pow;
-        u2 *:= t1;
-        s2 := b*Trace(u2,Kv)^(-pow);
-        if s2 eq K0!1 then
-            s1 := (-1)^(ZZ!(Trace(a*u1)));
-            S +:= s1;
-        end if;
-    end for;
-    return S;
-end function;
-
 // technical stuff to go through cyclotomic classes mod 2^m1
 function iatoi(W, n)
     a := 0;

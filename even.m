@@ -54,8 +54,9 @@ function CubicSumInv(a, b)
     return S;
 end function;
 
-//this is the boring sum
-//and the best implem?
+//this is the mysterious sum, which is up to some squares
+// \sum_{u_1 != 1, \psi_3(\tr(u_1)) = b \psi_3(w_2)} \chi(\tr(a w_1 u_1))
+//only made for v == 2
 function S12U1left(a, b, w1, w2)
     ZZ := Integers();
     K := Parent(w1);
@@ -121,120 +122,6 @@ function S12U1leftgen(a, b, K0, Kv)
     return S;
 end function;
 
-function S12U1partial(a, b, w1, w2);
-    ZZ := Integers();
-    K<z> := Parent(w1);
-    n := Degree(K);
-    pow := ZZ!((2^n-1)/3);
-    m1 := ZZ!(n/2);
-    t1 := z^(2^m1-1);
-    t1inv := t1^(-1);
-    L<y>, to_K := sub<K|m1>;
-    yinv := y^-1;
-    w1inv := w1^(-1);
-    w2pow := w2^(-pow);
-    // sum for u1 \neq w1^-1
-    u1 := w1inv;
-    u1inv := w1;
-    u2 := K!1;
-    u2inv := K!1;
-    S := 0;
-    for i in [0..2^m1-1] do
-        u1 *:= t1;
-        u1inv *:= t1inv;
-        u2 *:= t1;
-        u2inv *:= t1inv;
-        s2 := b*(u2 + u2inv)^(-pow)*w2pow;
-        if s2 eq K!1 then
-            s1 := (-1)^(ZZ!(Trace(L!(a*(u1^2+u1inv^2)) + FFInv((L!(u1^2+u1inv^2))))));
-            S +:= s1;
-        end if;
-    end for;
-    // sum over F_{2^m}^* \ {1}
-    l1 := L!1;
-    l1inv := L!1;
-    l2 := w1;
-    l2inv := w1inv;
-    for i in [1..2^m1-2] do
-        l1 *:= y;
-        l1inv *:= yinv;
-        l2 *:= y;
-        l2inv *:= yinv;
-        s2 := b*(l2 + l2inv)^(-pow)*w2pow;
-        if s2 eq K!1 then
-            s1 := (-1)^(ZZ!(Trace(L!(a*(l1^2+l1inv^2)) + FFInv((L!(l1^2+l1inv^2))))));
-            S +:= s1;
-        end if;
-    end for;
-    return S;
-end function;
-
-//this is the boring sum
-function SU12(a, b, w1, w2)
-    ZZ := Integers();
-    K := Parent(w1);
-    m0 := Degree(K);
-    m1 := ZZ!(m0/2);
-    m2 := ZZ!(m1/2);
-    L := GF(2, m2);
-    M := GF(4);
-    z := Generator(K);
-    pow := ZZ!((2^m0-1)/3);
-    t1 := z^(2^m1-1);
-    t1inv := t1^(-1);
-    t1pow := t1^(-2);
-    t2 := z^((2^m1+1)*(2^m2-1));
-    u1 := w1^-1;
-    u1pow := u1^(-2);
-    u2 := K!1;
-    u2inv := K!1;
-    S := 0;
-    //sum for u2 \neq 1
-    for i in [0..2^m1-1] do
-        u1pow *:= t1pow;
-        u1 *:= t1;
-        u2 := K!1;
-        for j in [0..2^m2] do
-            u2 *:= t2;
-            if Trace(u1*u2*w1*w2, L) eq 0 then
-                S +:= (-1)^(ZZ!(Trace(a*u1pow))) * (-1)^(ZZ!(Trace(b*M!(u2^pow))));
-            end if;
-        end for;
-    end for;
-    return S;
-end function;
-
-//this is the boring sum
-function SU12trace(a, b, w1, w2)
-    ZZ := Integers();
-    K := Parent(w1);
-    m0 := Degree(K);
-    m1 := ZZ!(m0/2);
-    m2 := ZZ!(m1/2);
-    J := GF(2, m1);
-    L := GF(2, m2);
-    M := GF(4);
-    z := Generator(K);
-    pow := ZZ!((2^m0-1)/3);
-    t1 := z^(2^m1-1);
-    t1inv := t1^(-1);
-    t1pow := t1^(-2);
-    t2 := z^((2^m1+1)*(2^m2-1));
-    u1 := w1^-1;
-    u1pow := u1^(-2)*a;
-    u1 *:= w1;
-    u2 := K!1;
-    u2inv := K!1;
-    S := 0;
-    //sum for u2 \neq 1
-    for i in [0..2^m1-1] do
-        u1pow *:= t1pow;
-        u1 *:= t1;
-        S +:= (-1)^(ZZ!(Trace(u1pow))) * (-1)^(ZZ!(Trace(b*M!((w2*Trace(u1,J))^-pow))));
-    end for;
-    return S;
-end function;
-
 // technical stuff to go through cyclotomic classes mod 2^m1
 function iatoi(W, n)
     a := 0;
@@ -272,6 +159,7 @@ procedure NextNecklaces(~W, ~a, ~p, n)
 end procedure;
 
 // only made for v == 2
+// and checks only when K_m1(a) = 1 mod 3
 function CheckConjecture(v, mv)
     m2 := 2^(v-2)*mv;
     m1 := 2^(v-1)*mv;
@@ -292,9 +180,6 @@ function CheckConjecture(v, mv)
     repeat
         NextNecklaces(~W, ~j, ~p, m1);
         if (j mod 3) ne 0 then
-            continue;
-        end if;
-        if (j ne 513) then
             continue;
         end if;
         a := z1^j;
@@ -343,7 +228,6 @@ while ((KS - 1) mod 3) ne 0 do
 end while;
 */
 
-/*
 // Looking for the mysterious function
 d := -2^m2;
 //for j in [0] do
@@ -373,41 +257,5 @@ for j in [1..2^m1-1] do
         end for;
         print #Sp, #Sm, #(Sp meet Sm);
         print Sp meet Sm;
-    end if;
-end for;
-*/
-
-v := 2;
-mv := 3;
-m2 := 2^(v-2)*mv;
-m1 := 2^(v-1)*mv;
-m0 := 2^v*mv;
-ZZ := Integers();
-Kvm<zvm> := GF(2,mv*2);
-K1<z1> := GF(2,m1);
-K0<z0> := GF(2,m0);
-w1 := z0^(2^m1-1);
-w2 := z1^(2^m2-1);
-//e := ZZ!((2^m0-1)/3)*(2^m1-1);
-e := 2^m1 - 1;
-f := ZZ!((2^m0-1)/3);
-g := ZZ!((2^m1-1)/3);
-for k in [0..2^m1-1] do
-    if (k mod 3) ne 0 then
-        continue;
-    end if;
-    a := z1^k;
-    c := z1^(ZZ!(k/3));
-    KS := KloostermanSum(a);
-    if ((KS - 1) mod 3) eq 0 then
-        print "===", k/3, a, KS, Trace(1/a), "=================================================";
-        for j in [1,2,4,8,16] do//1..2^(m1-1)] do
-            print "---", j, Trace(a*w1^(2*j)), Trace(c,GF(4))*GF(4)!(Trace(c*w1^(2*j),K1)^g), "---------";
-            for i in [0..2] do //..2] do //2^(m2)] do
-                Sab := S12U1left(a, b, w1^(j), w2^(i));
-                D := Sab - (2^(m2+1)-KS)/3 + (1 - (-1)^(ZZ!Trace(a*w1^(2*j)))) * (2^(m2-1) - 1)/3;
-                print i, D, Trace(a*w1^(2*j)) + Trace(GF(4)!(b*w2^(i*4*ZZ!((2^m2+1)/3))));
-            end for;
-        end for;
     end if;
 end for;

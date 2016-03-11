@@ -217,7 +217,7 @@ When $\omega = 0$, we have
 \begin{align*}
 \Wa{f_{a,b}}(0) & = 1 + \sum_{u \in U_1} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \chisf{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \\
 & = 1 + \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \chisf{\tr{2}{b c}} \\
-& = 1 - \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right)
+& = 1 + \frac{2^{m_1} - 1}{3} \left( K_{m_1}(a) - 1 \right)
 \end{align*}
 For $f_{a,b}$ to be bent, we must have $\Wa{f_{a,b}}(0) = 2^{m_1}$  because of the Hasse--Weil bound on $K_{m_1}(a)$ which leads to $K_{m_1}(a) = 4$ as Mesnager has already shown.
 
@@ -280,6 +280,8 @@ The second summand is
 & = 1 - \chisf{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} - K_{m_1}(a) \\
 \end{align*}
 
+\subsubsection{The hard sum}
+
 We are left to compute
 \begin{align*}
 \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \chisf{\tr{m_0}{a u_1^{-2}}} \\
@@ -306,7 +308,7 @@ First notice that:
 \end{align*}
 
 Define $\gamma \in \GF[4]{}^*$ by $\gamma = b \omega_2^{4 \frac{2^{m_2}+1}{3}}$,
-let $c \in GF[2]{m_1}^*$ be such that $\psi_3(c) = \gamma$,
+let $c \in \GF[2]{m_1}^*$ be such that $\psi_3(c) = \gamma$,
 $\alpha = \psi_3(a)$,
 and let $\beta \in \GF[4]{}^*$ be a primitive third root of unity.
 The sum can then be written as
@@ -410,15 +412,35 @@ Going back to the case $\omega_1 \neq 1$, \ie $\omega \in \GF{m_0}^*$, and suppo
 & \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
 & \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \chisf{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \chisf{\tr{m_0}{a \omega_1^2}} \right) \frac{2^{m_2-1} - 1}{3} \\
 \end{align*}
-Experimentally one remarks that there are exactly $2^{m_1 - 1} + 10 \frac{K_{m_1}(a) - 4}{12} + 2$ (respectively $2^{m_1 - 1} - 2 \frac{K_{m_1}(a) - 4}{12}$) values of $\omega_1$ such that the mysterious trace is zero when $b = 1$ (respectively $b \neq 1$) and $\omega_2 = 1$.
 
-Indeed
+Assuming $K_{m_1}(a) \equiv 1 \pmod{3}$ and the above formula for the sum is correct and plugging it into Parseval equality yields the following equality:
 \begin{align*}
-& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
-& \qquad = \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2} \omega_1^2}} \\
-& \ldots
+\sum_{x \in \GF{m_0}^*} \chisf{\tr{??}{??}} & = \frac{2^{m_1} - 1}{3} \left( K_{m_1}(a) - 1 \right) \\
+& = \Wa{f_{a,b}}(0) - 1 \\
+\end{align*}
+This is supported by experimental evidence that there are exactly $2^{m_1 - 1} + 5 \frac{K_{m_1}(a) - 4}{6} + 3$ (respectively $2^{m_1 - 1} - \frac{K_{m_1}(a) - 4}{6}$) values of $\omega_1 \in U_1$ such that the mysterious trace is zero when $b \psi_3(\omega_2) = 1$ (respectively $b \psi_3(\omega_2) \neq 1$).
+
+
+%Indeed
+%\begin{align*}
+%& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2}}} \\
+%& \qquad = \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \chisf{\tr{m_0}{a u_1^{-2} \omega_1^2}} \\
+%& \ldots
+%\end{align*}
+
+\subsubsection{Summing back}
+
+In the end we get the following (conjectured) formula when $K_{m_1}(a) \equiv 1 \pmod{3}$ and $\omega \neq 0$:
+\begin{align*}
+\Wa{f_{a,b}}(\omega)
+& = 1 + \frac{2^{m_2} + 1}{3} \left(1 - 2^{m_2} \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad - 2^{m_2} \left(1 - \chisf{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad + 2^{m_2 + 1} \left( \frac{2^{m_2 + 1} - K_{m_1}(a)}{3}  - \left( 1 - \chisf{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \chisf{f_a(\omega_1^{-1})} \right) \frac{2^{m_2-1} - 1}{3} \right) \\
+& = 2^{m_1} \chisf{\tr{??}{??}} + \frac{4 - K_{m_1}(a)}{3}
 \end{align*}
 
+This implies in particular that $f_{a,b}$ is bent if and only if $K_{m_1}(a) = 4$.
+(The above formula is valid only for $K_{m_1}(a) \equiv 1 \pmod{3}$ but recall that the value of the Walsh spectrum at $0$ enforces $K_{m_1}(a) = 4$ in all cases.)
 
 \subsection{Further steps}
 

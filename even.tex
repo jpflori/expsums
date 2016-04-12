@@ -59,7 +59,7 @@
 \newcommand{\Hfam}{\mathcal{H}}
 \newcommand{\Tfam}{\mathcal{T}}
 
-\hypersetup{pdftitle={A conjecture about mixed Gaussian sums and the bentness of a family of Boolean functions},%
+\hypersetup{pdftitle={A conjecture about mixed Gaussian sums and the bentness of Boolean functions},%
   pdfauthor={Jean-Pierre Flori},%
   pdfsubject={Mathematics and Cryptography},%
   pdfcreator={Jean-Pierre Flori},%
@@ -67,7 +67,7 @@
   pdfkeywords={mathematics} {cryptography} {Boolean functions} {bent functions} {Walsh spectrum} {Kloosterman sums},
 }
 
-\title{A conjecture about mixed Gaussian sums and the bentness of a family of Boolean functions}
+\title{A conjecture about mixed Gaussian sums and the bentness of Boolean functions}
 
 \author{Jean-Pierre Flori
   \thanks{ANSSI (Agence nationale de la sécurité des systèmes d'information),
@@ -195,7 +195,35 @@ f_{a,b}(x) = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \ensp
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 
 
-\section{Walsh spectrum}
+\section{Computing the Walsh spectrum}
+
+In this section some results valid for any value if $\nu \geq 1$ are given.
+
+First notice that it is enough to know how to evaluate the Walsh spectrum of
+functions $f_{a,b}$ for $a \in \GF{m_1}^*$ rather than $\GF{m_0}^*$.
+\begin{lemma}
+Let $a \in \GF{m_0}^*$ be written as $a = \alpha \tilde{a}$
+with $\alpha \in U_1$ and $\tilde{a} \in \GF{m_1}^*$
+using the polar decomposition of $\GF{m_0}^*$.
+Let $\tilde{\alpha} \in U_1$ be a squareroot of $\alpha$
+and $\beta \in GF[4]{}^*$ be $\beta = \tilde{alpha}^{(2^{m_0}-1)/3}$.
+Then
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = \Wa{f_{\tilde{a},\beta b}}(\tilde{\alpha} \omega) \enspace .
+\end{align*}
+\end{lemma}
+\begin{proof}
+Indeed, $x \mapsto \tilde{\alpha} x$ induces a permutation of $\GF{m_0}$,
+and $\tilde{\alpha}^{2^{m_1}-1} = \tilde{\alpha}^{-2} = \alpha^{-1}$,
+so that
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+& = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(\tilde{\alpha} x) + \tr{m_0}{\omega \tilde{\alpha} x}} \\
+& = \sum_{x \in \GF{m_0}} \chisf{f_{\tilde{a},\beta b}(x) + \tr{m_0}{\omega \tilde{\alpha} x}} \\
+& = \Wa{f_{\tilde{a},\beta b}}(\tilde{\alpha} \omega) \enspace . \qedhere
+\end{align*}
+\end{proof}
+From now on we can suppose that $a \in \GF{m_1}^*$ without loss of generality.
 
 Let's now compute the Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$:
 \begin{align*}

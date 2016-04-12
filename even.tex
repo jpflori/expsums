@@ -178,33 +178,33 @@ Therefore, $\GF{m_0}^*$ can be recursively decomposed as
 \GF{m_0}^* = U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* \enspace .
 \]
 
-The Boolean functions $f_{a,b}$ of interest are defined over $\GF{n} = \GF{m_0}$
+For extension degrees $k$ and $l$ such that $k$ divides $l$,
+the field trace from $\GF{l}$ down to $\GF{k}$ is denoted by $\tr[k]{l}{x}$.
+
+The Walsh spectrum of a Boolean function $f$ at $\omega \in \GF{m_0}$ is
+\begin{align*}
+\Wa{f}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f(x) + \tr{m_0}{\omega x}}  \enspace ,
+\end{align*}
+and $f$ is bent if and only if $\Wa{f}(\omega) = 2^{\pm m_1}$ for all $\omega \in \GF{m_0}$.
+
+The Boolean functions $f_{a,b}$ studied in this note are defined over $\GF{m_0}$
 and given in binomial form:
 \[
 f_{a,b}(x) = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \enspace ,
 \]
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 
-The Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$ is
-\begin{align*}
-\Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
-\end{align*}
-The Boolean function $f_{a,b}$ is bent if and only if
-\[
-\Wa{f_{a,b}}(\omega) = 2^{\pm m_1}
-\]
-for all $\omega \in \GF{m_0}$.
 
 \section{Walsh spectrum}
 
-Let's now compute the Walsh--Hadamard transform of $f_{a,b}$ at $\omega \in \GF{m_0}$:
+Let's now compute the Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$:
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
-& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} + \tr{m_0}{\omega x}} \\
 & = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}}} \chisf{\tr{2}{b x^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega x}} \\
-& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1} y^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u^{2^{m_1}-1}}} \chisf{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{u_1 \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1} y^{2^{m_1}-1}}} \chisf{\tr{2}{b u_1 ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 y}} \\
+& = 1 + \sum_{u_1 \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_1 ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 y}} \\
+& = 1 + \sum_{u_1 \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_1 ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 y}} \\
 \end{align*}
 
 \subsection{Odd case}

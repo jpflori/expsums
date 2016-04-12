@@ -143,10 +143,10 @@ Unfortunately, this expression is only valid when the extension degree $n$ is tw
 that is when $m$ is odd.
 In this case, her results proved that $f_{a,b}$ is (hyper-)bent if and only if $K_m(a) = 4$.
 Nonetheless, it is easy to show that $K_m(a) = 4$ is a necessary condition
-for $f_{a,b}$ to be bent even when $m$ is even (note that $f_{a,b}$ can not hyper-bent in this case)
+for $f_{a,b}$ to be bent even when $m$ is even (note that $f_{a,b}$ can not hyper-bent in that case)
 and this was conjectured to be true.
-Further experimental evidence gathered by Flori, Mesnager and Cohen supported this conjecture:
-for $m$ up to $16$, $f_{a,b}$ is bent if and only if $K_m(a) = 4$.
+Further experimental evidence gathered by Flori, Mesnager and Cohen~\cite{DBLP:journals/iacr/FloriMC11}
+supported this conjecture: for $m$ up to $16$, $f_{a,b}$ is bent if and only if $K_m(a) = 4$.
 
 In this note, the polar decomposition of fields of even extension degree is used
 to reduce the evaluation of the Walsh spectrum of $f_{a,b}$ to that of exponential sums
@@ -158,18 +158,44 @@ and supported by extensive experiments.
 In particular, the validity of this formula would prove the characterization
 conjectured by Mesnager for extensions of degree four times an odd number.
 
-\section{Characterization}
+\section{Notation}
 
-Let $\nu \geq 1$ the $2$-valuation of $n$.
-We denote by $m_i$ for $0 \leq i \leq \nu$ the integer $n / 2^i$, \eg $m_0 = n$ and $m_1 = m$ with the notations of the previous section.
+Let $n \geq 2$ be an even integer and
+$\nu \geq 1$ denote its $2$-valuation.
+We denote by $m_i$ for $0 \leq i \leq \nu$ the integer $n / 2^i$,
+\eg $m_0 = n$ and $m_1 = m$ with the notation of the previous section.
 
-We denote the polar decomposition of $\GF{m_i}^*$ for $0 \leq i < \nu$ by $\GF{m_i}^* = U_{i+1} \times \GF{m_{i+1}}^*$.
+For $0 \leq i < \nu$,  the extension degree of $\GF{m_i}$ is even and
+it multiplicative group  $\GF{m_i}^*$ can be split using the so-called
+polar decomposition
+\[
+\GF{m_i}^* = U_{i+1} \times \GF{m_{i+1}}^* \enspace ,
+\]
+where $U_{i+1} \subset \GF{m_i}^*$ is the subgroup of $2^{m_{i+1}} + 1$-st roots of unity
+and $\GF{m_{i+1}}^*$ the subgroup of $2^{m_{i+1}} - 1$-st roots of unity.
+Therefore, $\GF{m_0}^*$ can be recursively decomposed as
+\[
+\GF{m_0}^* = U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* \enspace .
+\]
 
-Let's start with a completely general case of a Boolean function defined on $\GF{m_0}$ by
+The Boolean functions $f_{a,b}$ of interest are defined over $\GF{n} = \GF{m_0}$
+and given in binomial form:
 \[
 f_{a,b}(x) = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \enspace ,
 \]
-where $a \in \GF{m_1}$, $b \in \GF[4]{}^*$ and without any hypothesis on $m_1$.
+where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
+
+The Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$ is
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+\end{align*}
+The Boolean function $f_{a,b}$ is bent if and only if
+\[
+\Wa{f_{a,b}}(\omega) = 2^{\pm m_1}
+\]
+for all $\omega \in \GF{m_0}$.
+
+\section{Walsh spectrum}
 
 Let's now compute the Walsh--Hadamard transform of $f_{a,b}$ at $\omega \in \GF{m_0}$:
 \begin{align*}

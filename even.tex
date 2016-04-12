@@ -84,8 +84,15 @@
 \maketitle
 
 \begin{abstract}
-  This note is devoted to the computation of the Walsh spectrum of binomial Boolean functions in a family first studied by Mesnager in the case where $m$ is even, a mathematically involved case which was left open by Mesnager and later studied experimentally by Flori and Mesnager.
-  In particular, we show that bentness of such functions can be characterized by means of Kloosterman sums as in the odd case.
+  In this note, the polar decomposition of binary fields of even extension degree is
+  used to reduce the evaluation of the Walsh spectrum of Boolean functions
+  within an infinite family in binomial form to that of exponential sums
+  over the underlying extensions of odd degree.
+  In the case of extensions of degree four times an odd number, an explicit formula
+  involving a Kloosterman sum is conjectured and supported by extensive experiments.
+  In particular, the validity of this formula would prove a simple and efficient
+  characterization conjectured by Mesnager for extensions of degree four times
+  an odd number.
 \end{abstract}
 
 \noindent
@@ -95,29 +102,61 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Characterizing the bentness of Boolean functions using simple and efficient criteria is a challenging problem.
+Bent functions are Boolean functions achieving optimal non-linearity
+and are of both combinatorial and cryptographic interest.
+Unfortunately, characterizing bentness is hard,
+and even providing simple and efficient criteria within infinite families
+of functions in a specific form is a challenging problem.
 
-The most classical family of monomial functions give in polynomial is due to Dillon~\cite{MR2624542} in 1974.
+The simplest characterization for bentness of a function $f$ defined over
+defined over $\GF{n}$ with $n = 2 m$ it that its Walsh spectrum $\Wa{f}$
+takes only the values $2^{\pm m}$.
+Such a characterization is neither concise nor efficient:
+the best algorithm to compute the full Walsh spectrum has complexity $O(n 2^n)$
+and this is asymptotically optimal, whence the need to restrict to functions
+in a given form and look for more efficient criteria
+Unfortunately, only a few infinite families of Boolean functions with a simple and efficient
+criterium for bentness are known.
+
+The most classical family is due to Dillon~\cite{MR2624542} and is made of monomial
+functions:
 \[
 f_a(x) = \tr{n}{a x^{r(2^m-1)}} \enspace ,
 \]
-where $a \in \GF{n}$ and $r$ is co-prime with $2^m + 1$.
-Such functions are not only bent, but also hyper-bent, if and only if the Kloosterman sum associated with $a$ is equal to zero~\cite{MR2624542,DBLP:journals/tit/Leander06,DBLP:journals/tit/CharpinG08}.
-The connection between Kloosterman sums and elliptic curves~\cite{MR0308088,MR925289,MR1054286} has since permitted to look for zeros of Kloosterman sums in very efficient way~\cite{DBLP:conf/seta/Lisonek08,DBLP:journals/corr/abs-1104-3882}.
-Further results on Kloosterman sums involving $p$-adic arithmetic~\cite{MR2794931,6126036,Moloney:PHD} lead to even faster generation of zeros of Kloosterman sums and so of hyper-bent functions.
+where $n = 2 m$, $a \in \GF{n}$ and $r$ is co-prime with $2^m + 1$.
+Such functions are bent (and even hyper-bent) if and only if the Kloosterman sum $K_m(a)$
+associated with $a$ is equal to zero~\cite{MR2624542,DBLP:journals/tit/Leander06,DBLP:journals/tit/CharpinG08}.
+Not only does such a criterium gives a concise and elegant characterization for bentness,
+but using the connection between Kloosterman sums and elliptic curves~\cite{MR0308088,MR925289,MR1054286}
+it also allows to check for it in polynomial time~\cite{DBLP:conf/seta/Lisonek08,DBLP:journals/corr/abs-1104-3882}.
+Further results on Kloosterman sums involving $p$-adic arithmetic~\cite{MR2794931,6126036,Moloney:PHD}
+lead to even faster generation of zeros of Kloosterman sums and so of (hyper-)bent functions.
 
-Quite recently Mesnager~\cite{DBLP:journals/dcc/Mesnager11} studied the following family of binomial functions:
+Mesnager~\cite{DBLP:journals/dcc/Mesnager11} proved a similar criterium
+for a family Boolean functions in binomial form:
 \[
 f_{a,b}(x) = \tr{n}{a x^{r(2^m-1)}} + \tr{2}{b x^{\frac{2^n-1}{3}}} \enspace ,
 \]
-where $a \in \GF{n}$, $b \in \GF[4]{}^*$.
-In the case where $m$ is odd, she could prove that $f_{a,b}$ is hyper-bent iff $K_m(a) = 4$.
-In the case where $m$ is even, she could only prove that $K_m(a) = 4$ is a necessary condition for $f_{a,b}$ to be bent (note that they can not hyper-bent in this case).
+where $n = 2 m$, $a \in \GF{n}$, $b \in \GF[4]{}^*$.
+To do so, she expressed the Walsh spectrum of $f_{a,b}$ using the Kloosterman sum $K_m(a)$.
+Unfortunately, this expression is only valid when the extension degree $n$ is twice an odd number,
+that is when $m$ is odd.
+In this case, her results proved that $f_{a,b}$ is (hyper-)bent if and only if $K_m(a) = 4$.
+Nonetheless, it is easy to show that $K_m(a) = 4$ is a necessary condition
+for $f_{a,b}$ to be bent even when $m$ is even (note that $f_{a,b}$ can not hyper-bent in this case)
+and this was conjectured to be true.
+Further experimental evidence gathered by Flori, Mesnager and Cohen supported this conjecture:
+for $m$ up to $16$, $f_{a,b}$ is bent if and only if $K_m(a) = 4$.
 
-In a consequent work Flori, Mesnager and Cohen adapted the ideas used to efficiently find zeros of Kloosterman sums to generate value $4$ of Kloosterman sums and so hyper-bent functions in the case where $m$ is odd.
-In the case where $m$ is even, they also checked for $m$ up to $16$ that the functions associated with $a \in \GF{m}$ such that $K_m(a)$ are always bent, so providing evidence that the result proved by Mesnager in the odd case could hold in the even case, even though the techniques used in the proof are no longer applicable.
-
-In this paper, we settle the even case: when $m$ is even, $f_{a,b}$ is bent iff $K_m(a) = 4$.
+In this note, the polar decomposition of fields of even extension degree is used
+to reduce the evaluation of the Walsh spectrum of $f_{a,b}$ to that of exponential sums
+over the underlying extensions of odd degree.
+In the case of extensions of degree four times an odd number,
+that is when $m$ is twice an odd number,
+an explicit formula involving the Kloosterman sum $K_m(a)$ is conjectured
+and supported by extensive experiments.
+In particular, the validity of this formula would prove the characterization
+conjectured by Mesnager for extensions of degree four times an odd number.
 
 \section{Characterization}
 

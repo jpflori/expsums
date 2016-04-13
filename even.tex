@@ -71,7 +71,7 @@
 
 \author{Jean-Pierre Flori
   \thanks{ANSSI (Agence nationale de la sécurité des systèmes d'information),
-    51, boulevard de la Tour-Maubourg,
+    51, boulevard de La Tour-Maubourg,
     75700 Paris 07 SP, France.
     \texttt{jean-pierre.flori@ssi.gouv.fr}}
 }
@@ -96,7 +96,7 @@
 \end{abstract}
 
 \noindent
-{\bf Keywords}. Boolean functions, bent functions, Walsh--Hadamard transform, exponential sums, Kloosterman sums, elliptic curves.
+{\bf Keywords}. Boolean functions, bent functions, Walsh spectrum, exponential sums, Gaussian sums, Kloosterman sums.
 
 
 \section{Introduction}
@@ -197,7 +197,7 @@ where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 
 \section{Computing the Walsh spectrum}
 
-In this section some results valid for any value if $\nu \geq 1$ are given.
+\subsection{Restricting the coefficient field of definition}
 
 First notice that it is enough to know how to evaluate the Walsh spectrum of
 functions $f_{a,b}$ for $a \in \GF{m_1}^*$ rather than $\GF{m_0}^*$.
@@ -225,10 +225,23 @@ so that
 \end{proof}
 From now on we can suppose that $a \in \GF{m_1}^*$ without loss of generality.
 
-Let's now compute the Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$:
+\subsection{Polar decomposition}
+
+We now start splitting the Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$ using the polar decomposition of $\GF{m_0}^*$ as $\GF{m_0}^* = U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^*$.
+We write $x \in \GF{m_0}^*$ as $x = u_1 \cdots u_\nu y = u y$ for $u_i \in U_i$, $u = u_1 \cdots u_\nu \in U$, and $y \in \GF{m_\nu}^*$.
+The Walsh spectrum of $f_{a,b}$ at $\omega \in \GF{m_0}$ can then be written
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
-& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} + \tr{m_0}{\omega x}} \\
+& = 1 + \sum_{x \in \GF{m_0}^*} \chisf{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
+& = 1 + \sum_{(u, y) \in U \times \GF{m_\nu}^*} \chisf{f_{a,b}(u y)} \chisf{\tr{m_0}{\omega u y}} \\
+\end{align*}
+Note that $3$ divides $2^{m_\nu}+1$ so that $\frac{2^{m_0}-1}{3} = (2^{m_\nu}-1) \frac{2^{m_\nu}+1}{3} \prod_{i=1}^{\nu-1}(2^{m_i}+1)$ and $f_{a,b}(u y) = f_{a,b}(u)$.
+Therefore
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U} \chisf{f_{a,b}(u)} \sum_{y \in \GF{m_\nu}^*} \chisf{\tr{m_0}{\omega u y}} \\
+\end{align*}
+\begin{align*}
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} + \tr{m_0}{\omega x}} \\
 & = 1 + \sum_{x \in \GF{m_0}^*} \chisf{\tr{m_0}{a x^{2^{m_1}-1}}} \chisf{\tr{2}{b x^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega x}} \\
 & = 1 + \sum_{u_1 \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1} y^{2^{m_1}-1}}} \chisf{\tr{2}{b u_1 ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 y}} \\
 & = 1 + \sum_{u_1 \in U_1} \sum_{y \in \GF{m_1}^*} \chisf{\tr{m_0}{a u_1^{2^{m_1}-1}}} \chisf{\tr{2}{b u_1 ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \chisf{\tr{m_0}{\omega u_1 y}} \\

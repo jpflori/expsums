@@ -211,6 +211,8 @@ f_{a,b}(x) & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \\
 \end{align*}
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 
+Dickson polynomials.
+
 
 \section{Computing the Walsh spectrum}
 
@@ -255,63 +257,45 @@ The Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$ can then be written
 Note that $3$ divides $2^{m_\nu}+1$ so that $\frac{2^{m_0}-1}{3} = (2^{m_\nu}-1) \frac{2^{m_\nu}+1}{3} \prod_{i=1}^{\nu-1}(2^{m_i}+1)$ and $f_{a,b}(u y) = f_{a,b}(u)$.
 Therefore
 \begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U} \addch{f_{a,b}(u)} \sum_{y \in \GF{m_\nu}^*} \addch{\tr{m_\nu}{\tr[m_\nu]{m_0}{\omega u} y}} \\
+\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U} \addch{f_{a,b}(u)} \sum_{y \in \GF{m_\nu}^*} \addch{\tr{m_\nu}{\tr[m_\nu]{m_0}{\omega u} y}} \enspace .
 \end{align*}
 The sum ranging over $\GF{m_\nu}^*$ is equal to $-1$ when $\tr[m_\nu]{m_0}{\omega u} \neq 0$ and $2^{m_1}-1$ when $\tr[m_\nu]{m_0}{\omega u} = 0$.
 
-Therefore, when $\omega = 0$, the Walsh transform is
-\begin{align*}
-\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_1} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace .
-\end{align*}
+When $\omega = 0$, the Walsh transform is
+\begin{align}
+\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_1} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshzero}
+\end{align}
 
 When $\omega \in \GF{m_0}^*$, write its polar decomposition $\omega = w_1 \cdots w_\nu o = w o$ where $(w_1, \ldots, w_\nu, o) \in U_1 \times \cdots U_\nu \times \GF{m_\nu}^*$ and $w = w_1 \cdots w_\nu$.
 Then $\tr[m_\nu]{m_0}{\omega u} = 0$ if and only if there exists $1 \leq i \leq \nu$
 such that $u_i = w_i^{-1}$.
 The Walsh transform is then
-\begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 - \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} \neq 0} \addch{f_{a,b}(u)} + (2^{m_\nu} - 1) \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \\
-& = 1 - \sum_{u \in U} \addch{f_{a,b}(u)} + 2^{m_\nu} \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \enspace .\\
-\end{align*}
+\begin{align}
+\Wa{f_{a,b}}(\omega) & = 1 - \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} \neq 0} \addch{f_{a,b}(u)} + (2^{m_\nu} - 1) \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \nonumber \\
+& = 1 - \sum_{u \in U} \addch{f_{a,b}(u)} + 2^{m_\nu} \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshunit}
+\end{align}
+To go further, the cases $\nu = 1$ and $\nu \geq 2$ have to be dealt with separately.
 
 \section{Odd case}
 
-Now suppose that $\nu = 1$, \ie $m_1$ is odd, which is the case that Mesnager settled.
-Then
+In this section, it is supposed that $\nu = 1$, \ie $m_1$ is odd and $U = U_1$, which is the case that Mesnager settled~\cite{DBLP:journals/dcc/Mesnager11} and that is recalled here for completeness and because it inspired the treatment of the general case.
+
+For $\omega \neq 0$, $\tr[m_1]{m_0}{\omega u_1} = 0$ if and only if $u_1 = w_1^{-1}$, so that
 \begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b u ^{\frac{2^{m_0}-1}{3}} y^{\frac{2^{m_0}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{f_{a,b}(u)} \addch{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \addch{f_{a,b}(u)} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{\omega u y}} \\
+\sum_{u_1 \in U_1, \tr[m_1]{m_0}{\omega u_1} = 0} \addch{f_{a,b}(u_1)}
+& = \addch{f_{a,b}(w_1^{-1})} \enspace .
 \end{align*}
 
-If $\omega = 0$, then
+The only difficulty lies in the computation of $\sum_{u_1 \in U_1} \addch{f_{a,b}(u_1)}$ which can be done by splitting the sum on $U_1$ according to the value of $\mulch{u_1}$:
 \begin{align*}
-\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_1} - 1 \right) \sum_{u \in U_1} \addch{f_{a,b}(u)} \\
-\end{align*}
-If $\omega \neq 0$, then
-\begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \addch{f_{a,b}(u)} \left( \sum_{y \in \GF{m_1}} \addch{\tr{m_0}{\omega u y}} - 1 \right) \\
-& = 1 - \sum_{u \in U_1} \addch{f_{a,b}(u)} + \sum_{u \in U_1} \addch{f_{a,b}(u)} \sum_{y \in \GF{m_1}} \addch{\tr{m_0}{\omega u y}} \\
-& = 1 - \sum_{u \in U_1} \addch{f_{a,b}(u)} + \sum_{u \in U_1} \addch{f_{a,b}(u)} \sum_{y \in \GF{m_1}} \addch{\tr{m_1}{\tr[m_1]{m_0}{\omega u} y}} \\
-& = 1 - \sum_{u \in U_1} \addch{f_{a,b}(u)} + 2^{m_1} \sum_{u \in U_1, \tr[m_1]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \\
-& = 1 - \sum_{u \in U_1} \addch{f_{a,b}(u)} + 2^{m_1} \addch{f_{a,b}(\omega^{\frac{2^{m_1}-1}{3}})} \\
+\sum_{u_1 \in U_1} \addch{f_{a,b}(u_1)} & = \sum_{u_1 \in U_1} \addch{f_{a}(u_1)} \addch{\tr{2}{b \mulch{u_1}}} \\
+& = \sum_{u_1\in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)} - \sum_{u_1\in U_1, b \mulch{u_1} \neq 1} \addch{f_{a}(u_1)} \\
+& = 2 \sum_{u_1\in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)} - \sum_{u_1\in U_1} \addch{f_{a}(u_1)} \enspace .
 \end{align*}
 
-One then concludes by computing the value of
+It is well known that the second sum is
 \begin{align*}
-\sum_{u \in U_1} \addch{f_{a,b}(u)}
-\end{align*}
-which depends on the value of $b$.
-Mesnager did it using the fact that $3$ divides $2^{m_1}+1$ and splitting the sum on $U_1$ into three sums $S_0$, $S_1$ and $S_2$.
-We recall that computation here.
-\begin{align*}
-\sum_{u \in U_1} \addch{f_{a,b}(u)} & = \sum_{u \in U_1} \addch{f_{a}(u)} \addch{\tr{2}{b u^{\frac{2^{m_0}-1}{3}}}} \\
-& = \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} = 1} \addch{f_{a}(u)} - \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} \neq 1} \addch{f_{a}(u)} \\
-& = 2 \sum_{u \in U_1, b u^{\frac{2^{m_0}-1}{3}} = 1} \addch{f_{a}(u)} - \sum_{u \in U_1} \addch{f_{a}(u)} \\
-\end{align*}
-
-The second sum is equal to
-\begin{align*}
-\sum_{u \in U_1} \addch{f_{a}(u)} & = 1 - K_{m_1}(a) \\
+\sum_{u_1 \in U_1} \addch{f_{a}(u_1)} & = 1 - K_{m_1}(a) \enspace .
 \end{align*}
 
 As far as the first one is concerned, it is enough to compute it for $b = 1$.
@@ -319,23 +303,63 @@ Indeed, set $\beta$ to be a primitive third root of unity (which generates $\GF[
 then it takes the same value for $b = \beta$ and $b = \beta^2$,
 and the sum over these three values has just been computed.
 
-Then the first sum is
+Let $D_3(x) = x^3 + x$ be the third Dickson polynomial of the first kind and $\T_{m_1}^i \subset \GF{m_1}$ denote the set of elements whose inverses have trace $i$ for $i \in \GF{}$.
+As $m_1$ is odd, $D_3$ induces a permutation of $\T_{m_1}^0$.
+For $b = 1$, one can therefore compute
 \begin{align*}
-\sum_{u \in U_1, u^{\frac{2^{m_0}-1}{3}} = 1} \addch{f_{a}(u)} & = \frac{1}{3} \sum_{u \in U_1} \addch{f_{a}(u^3)} \\
-& = \frac{1}{3} \sum_{u \in U_1} \addch{\tr{m_1}{a \left( u^3 + u^{-3} \right)}} \\
-& = \frac{1}{3} \sum_{u \in U_1} \addch{\tr{m_1}{a D_3(u + u^{-1})}} \\
-& = \frac{1}{3} \left( 1 + \sum_{u \neq 1} \addch{\tr{m_1}{a D_3(u + u^{-1})}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \T_1} \addch{\tr{m_1}{a D_3(t)}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_0} \addch{\tr{m_1}{a D_3(t)}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_0} \addch{\tr{m_1}{a t}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 C_{m_1}(a, a) - K_{m_1}(a) \right) \\
+\sum_{u_1 \in U_1, \mulch{u_1} = 1} \addch{f_{a}(u_1)} & = \frac{1}{3} \sum_{u_1 \in U_1} \addch{f_{a}(u_1^3)} \\
+& = \frac{1}{3} \sum_{u_1 \in U_1} \addch{\tr{m_1}{a \left( u_1^3 + u_1^{-3} \right)}} \\
+& = \frac{1}{3} \sum_{u_1 \in U_1} \addch{\tr{m_1}{a D_3(u_1 + u_1^{-1})}} \\
+& = \frac{1}{3} \left( 1 + \sum_{u_1 \neq 1} \addch{\tr{m_1}{a D_3(u_1 + u_1^{-1})}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{a D_3(t)}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{a D_3(t)}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{a t}} \right) \\
+& = \frac{1}{3} \left( 1 + 2 C_{m_1}(a, a) - K_{m_1}(a) \right) \enspace .
 \end{align*}
-Finally, the values of $C_{m_1}(a, a)$ were computed by Carlitz~\cite{MR544577} and give the desired result.
+For $b \neq 1$, one deduces
+\begin{align*}
+\sum_{u_1 \in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)}
+& = \frac{1}{3} \left( 1 - C_{m_1}(a, a) - K_{m_1}(a) \right) \enspace .
+\end{align*}
+
+Summarizing the above,
+for $\omega = 0$:
+\begin{align}
+\Wa{f_{a,b}}(0)
+= \left\{
+\begin{array}{ll}
+1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$ ;} \\
+1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) + 2 C_{m_1}(a, a) \right) & \text{if $b \neq 1$ ;}
+\end{array}
+\right.
+\end{align}
+and for $\omega \neq 0$:
+\begin{align}
+\Wa{f_{a,b}}(\omega)
+& = \left\{
+\begin{array}{ll}
+1 + 2^{m_1} \addch{f_{a,b}(w_1^{-1})} + \frac{1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$ ;}\\
+1 + 2^{m_1} \addch{f_{a,b}(w_1^{-1})} + \frac{1}{3} \left( 1 - K_{m_1}(a) + 2 C_{m_1}(a, a) \right) & \text{if $b \neq 1$.}
+\end{array}
+\right.
+\end{align}
+
+The values of $C_{m_1}(a, a)$ were computed by Carlitz~\cite{MR544577}
+and yield a concise and easy to compute formula for the Walsh spectrum
+of $f_{a,b}$.
+Moreover, Charpin \etal~\cite{4595463,DBLP:journals/dm/CharpinHZ09} derived from Carlitz's results
+that $C_{m_1}(a, a) = 0$ if and only if $K_{m_1}(a) \equiv 1 \pmod{3}$.
+Together with the Hasse--Weil bound, it is enough to prove that
+$f_{a,b}$ is (hyper-)bent if and only if $K_{m_1}(a) = 4$
+as noted by Mesnager~\cite{DBLP:journals/dcc/Mesnager11}.
 
 \section{Even case}
 
-Now suppose that $\nu > 1$, that is $m_0$ and $m_1$ are even.
-Now $3$ does not divide $2^{m_1} + 1$ but $2^{m_1}-1$, so that $\frac{2^{m_0}-1}{3} = \left( 2^{m_1} + 1 \right) \frac{2^{m_1}-1}{3}$.
+In this section, it is supposed that $\nu \geq 2$, \ie both $m_0$ and $m_1$ are even.
+The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$.
+
+Equation~\ref{eqn:walshzero}
+
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b u ^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}} y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
 & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\

@@ -210,9 +210,8 @@ f_{a,b}(x) & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \\
 & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b \mulch{x}} \enspace ,
 \end{align*}
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
-
-Dickson polynomials.
-
+We also define $f_a = f_{a,0}$ (corresponding to Dillon's monomial) and
+$g_b(x) = \tr{2}{b \mulch{x}}$.
 
 \section{Computing the Walsh spectrum}
 
@@ -252,7 +251,7 @@ The Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$ can then be written
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
 & = 1 + \sum_{x \in \GF{m_0}^*} \addch{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
-& = 1 + \sum_{(u, y) \in U \times \GF{m_\nu}^*} \addch{f_{a,b}(u y)} \addch{\tr{m_0}{\omega u y}} \\
+& = 1 + \sum_{(u, y) \in U \times \GF{m_\nu}^*} \addch{f_{a,b}(u y)} \addch{\tr{m_0}{\omega u y}} \enspace .
 \end{align*}
 Note that $3$ divides $2^{m_\nu}+1$ so that $\frac{2^{m_0}-1}{3} = (2^{m_\nu}-1) \frac{2^{m_\nu}+1}{3} \prod_{i=1}^{\nu-1}(2^{m_i}+1)$ and $f_{a,b}(u y) = f_{a,b}(u)$.
 Therefore
@@ -277,6 +276,7 @@ The Walsh transform is then
 To go further, the cases $\nu = 1$ and $\nu \geq 2$ have to be dealt with separately.
 
 \section{Odd case}
+\label{sec:odd}
 
 In this section, it is supposed that $\nu = 1$, \ie $m_1$ is odd and $U = U_1$, which is the case that Mesnager settled~\cite{DBLP:journals/dcc/Mesnager11} and that is recalled here for completeness and because it inspired the treatment of the general case.
 
@@ -359,12 +359,13 @@ In this section, it is supposed that $\nu \geq 2$, \ie both $m_0$ and $m_1$ are 
 The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$ and $\psi{u}$ does not depend on the value of $u_1$ (but only on that of $u_\nu$).
 
 In particular, the computation of $\sum_{u \in U} f_{a,b}(u)$ is straightforward:
-\begin{align*}
+\begin{align}
 \sum_{u \in U} f_{a,b}(u)
-& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \sum_{u_1 \in U_1} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b \mulch{u_\nu}}} \\
-& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
-& = - \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \enspace .
-\end{align*}
+& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \sum_{u_1 \in U_1} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)} \nonumber \\
+& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \nonumber \\
+& = - \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \nonumber \\
+& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3 \left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \enspace . \label{eqn:sumfab}
+\end{align}
 Equation~\ref{eqn:walshzero} therefore becomes
 \begin{align}
 \Wa{f_{a,b}}(0)
@@ -375,16 +376,70 @@ the Hasse--Weil bound on $K_{m_1}(a)$ implies that,
 if $f_{a,b}$ is bent, then $\Wa{f_{a,b}}(0) = 2^{m_1}$
 and so $K_{m_1}(a) = 4$.
 
-\begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b u ^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}} y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
-& = 1 + \sum_{u \in U_1} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
-\end{align*}
+Equation~\ref{eqn:walshunit} becomes
+\begin{align}
+\Wa{f_{a,b}}(\omega)
+& = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3 \left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \left( 1 - K_{m_1}(a) \right) + 2^{m_\nu} \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \enspace .
+\end{align}
+The sum over $u \in U$ can be split into smaller sums according to the extension $\GF{m_i}$ where
+$\tr[m_i]{m_0}{u \omega} = 0$ with $1 \leq i \leq \nu$.
 
-When $\omega \neq 0$, we only get
+The first sum (corresponding to $i=1$) has to be dealt with separately and can be simplified as Equation~\ref{eqn:sumfab}:
+\begin{align}
+\sum_{u_1 = w_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
+%& = - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(w_1^{-1})} \\
+& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(w_1^{-1})} \enspace . \label{eqn:sumfirst}
+\end{align}
+
+The second one (correspond to $i = 2$) is
 \begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*}  \addch{\tr{2}{b (u_2 y)^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u_1 u_2 y}} \\
+\sum_{\substack{u_1 \neq w_1^{-1},\\ \tr[m_2]{m_0}{u_1 u_2 w_1 w_2} = 0,\\ u_3 \in U_3, \ldots, u_\nu \in U_\nu}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
+& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)} \\
+& = - \frac{2^{2^{\nu-2} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
 \end{align*}
+together with similar terms:
+\begin{align*}
+\sum_{\substack{\tr[m_{i-1}]{m_0}{u_1 \cdots u_{i-1} w_1 \cdots w_{i-1}} \neq 0, \\ \tr[m_i]{m_0}{u_1 \cdots u_i w_1 \cdots w_i} = 0, \\u_{i+1} \in U_{i+1}, u_\nu \in U_\nu}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
+& = - \prod_{i=2}^{i-1} 2^{m_i}  \frac{2^{2^{\nu-2} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
+\end{align*}
+until the penultimate one (corresponding to $i = \nu - 1$):
+\begin{align*}
+\sum_{\substack{\tr[m_{\nu-2}]{m_0}{u_1 \cdots u_{\nu-2} w_1 \cdots w_{\nu-2}} \neq 0, \\ \tr[m_\nu-1]{m_0}{u_1 \cdots u_{\nu-1} w_1 \cdots w_{\nu-1}} = 0, \\ u_\nu \in U_\nu}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
+& = - \prod_{i=2}^{i-1} 2^{m_i} \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ;
+\end{align*}
+and they sum back up to
+\begin{align}
+%- \frac{2^{\left( 2^{\nu-2} - 1 \right) m_{\nu-1}}-1}{2^{m_{\nu-1}}-1} \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+& - \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \label{eqn:summiddle}
+\end{align}
+as an easy induction shows.
+
+The last sum (corresponding to $i = \nu$) can be split according to the value of
+$\mulch{u_\nu}$ as in Section~\ref{sec:odd}:
+\begin{align*}
+\sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
+& = 2 \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)}
+ - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \enspace ,
+\end{align*}
+where the second term is easily shown to be
+\begin{align}
+- \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0 }} \addch{f_a(u_1)}
+%& = - 2^{m_2} \cdots 2^{m_{\nu - 1}} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \\
+& = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace . \label{eqn:sumlast}
+\end{align}
+
+Equations~\ref{eqn:sumfirst}, \ref{eqn:summiddle} and \ref{eqn:sumlast} lead to the following expression for the Walsh transform at $\omega \neq 0$:
+\begin{align}
+\Wa{f_{a,b}}(\omega)
+& = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \nonumber \\
+& \qquad - 2^{m_\nu} \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(w_1^{-1})} \nonumber \\
+& \qquad - 2^{m_\nu} \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
+& \qquad - 2^{m_\nu} 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
+& \qquad + 2^{m_{\nu} + 1} \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \nonumber \\
+& = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - 2^{m_\nu} \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
+& \qquad - \left( \frac{2^{\left( 2^{\nu-1} - 2^{m_\nu} \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} + 2^{\left(2^{\nu - 1} - 1\right) m_\nu} \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
+& \qquad + 2^{m_{\nu} + 1} \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \enspace .
+\end{align}
 
 \subsection{Initial step}
 
@@ -601,91 +656,6 @@ In the end we get the following (conjectured) formula when $K_{m_1}(a) \equiv 1 
 
 This implies in particular that $f_{a,b}$ is bent if and only if $K_{m_1}(a) = 4$.
 (The above formula is valid only for $K_{m_1}(a) \equiv 1 \pmod{3}$ but recall that the value of the Walsh transform at $0$ enforces $K_{m_1}(a) = 4$ in all cases.)
-
-\subsection{Further steps}
-
-Let us now suppose $\nu > 2$.
-Similarly to the above case, one has
-\begin{align*}
-& = 1 - \prod_{i=2}^{\nu-1} \left( 2^{m_i} + 1 \right) \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-\Wa{f_{a,b}}(\omega) & = 1 - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad + 2^{m_\nu} \sum_{(u_1, \ldots,  u_\nu) \in U_1 \times \cdots \times U_\nu, \tr[m_\nu]{m_0}{u_1 \cdots u_\nu \omega} = 0} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-\end{align*}
-
-As above, the first sum (corresponding to $y = 0$) yields
-\begin{align*}
-& - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad = \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \\
-& \qquad = \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \\
-\end{align*}
-
-As above, the second one (summing over $y \in \GF{m_\nu}$) can be decomposed into different summands.
-The first one is
-\begin{align*}
-%& \sum_{u_1 \sim \omega_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \sum_{u_1 = \omega_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad = - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(\omega_1^{-1})} \\
-& \qquad = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(\omega_1^{-1})} \\
-\end{align*}
-The second one is
-\begin{align*}
-%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, u_3 \in U_3, \ldots, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \sum_{u_1 \neq \omega_1^{-1}, \tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2} = 0, u_3 \in U_3, \ldots, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad = - \left( 2^{m_3} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
-\end{align*}
-together with similar terms
-\begin{align*}
-%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_{i} \sim \omega_{i}^{-1} \tr[m_{i-1}]{m_0}{u_1 \omega_1 \cdots u_{i-1} \omega_{i-1}}^{-1}, u_{i+1} \in U_{i+1}, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \sum_{\tr[m_{i-1}]{m_0}{u_1 \cdots u_{i-1} \omega_1 \cdots \omega_{i-1}} \neq 0, \tr[m_i]{m_0}{u_1 \cdots u_i \omega_1 \cdots \omega_i} = 0, u_{i+1} \in U_{i+1}, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad = - 2^{m_2} \cdots 2^{m_{i - 1}} \left( 2^{m_{i+1}} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
-\end{align*}
-until
-\begin{align*}
-%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_{\nu-1} \sim \omega_{\nu-1}^{-1} \tr[m_{\nu-2}]{m_0}{u_1 \omega_1 \cdots u_{\nu-2} \omega_{\nu-2}}^{-1}, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \sum_{\tr[m_{\nu-2}]{m_0}{u_1 \cdots u_{\nu-2} \omega_1 \cdots \omega_{\nu-2}} \neq 0, \tr[m_\nu-1]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} = 0, u_\nu \in U_\nu} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad = - 2^{m_2} \cdots 2^{m_{\nu - 2}} \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
-\end{align*}
-which sum back up to
-\begin{align*}
-& - \frac{2^{\left( 2^{\nu-2} - 1 \right) m_{\nu-1}}-1}{2^{m_{\nu-1}}-1} \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad = - \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right)
-\end{align*}
-as an easy induction shows.
-And finally
-\begin{align*}
-%& \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-& \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_\nu^{\frac{2^{m_0}-1}{3}}}} \\
-\end{align*}
-
-This last sum can be splitted as
-\begin{align*}
-%& 2 \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-%& \qquad - \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& 2 \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& \qquad - \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-\end{align*}
-where the second term is
-\begin{align*}
-%& - \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& - \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0 } \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& \qquad = - 2^{m_2} \cdots 2^{m_{\nu - 1}} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-\end{align*}
-
-This leads to the following expression
-\begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \\
-& \qquad - 2^{m_\nu} \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(\omega_1^{-1})} \\
-& \qquad - 2^{m_\nu} \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad - 2^{m_\nu} 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-%& \qquad + 2^{m_{\nu} + 1} \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& \qquad + 2^{m_{\nu} + 1} \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - 2^{m_\nu} \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad - \left( \frac{2^{\left( 2^{\nu-1} - 2^{m_\nu} \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} + 2^{\left(2^{\nu - 1} - 1\right) m_\nu} \right) \left( 1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-%& \qquad + 2^{m_{\nu} + 1} \sum_{u_1 \not\sim \omega_1^{-1}, u_2 \not\sim \omega_2^{-1} \tr[m_1]{m0}{u_1 \omega_1}^{-1}, \ldots, u_\nu \sim \omega_{\nu}^{-1} \tr[m_{\nu-1}]{m_0}{u_1 \omega_1 \cdots u_{\nu-1} \omega_{\nu-1}}^{-1}, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& \qquad + 2^{m_{\nu} + 1} \sum_{\tr[m_{\nu-1}]{m_0}{u_1 \cdots u_{\nu-1} \omega_1 \cdots \omega_{\nu-1}} \neq 0, \tr[m_\nu]{m_0}{u_1 \cdots u_{\nu} \omega_1 \cdots \omega_\nu} = 0, b u_\nu^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-\end{align*}
-which generalizes the case $\nu = 2$.
 
 \section{Conclusion}
 

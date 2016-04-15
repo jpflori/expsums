@@ -363,13 +363,13 @@ In particular, the computation of $\sum_{u \in U} f_{a,b}(u)$ is straightforward
 \sum_{u \in U} f_{a,b}(u)
 & = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \sum_{u_1 \in U_1} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b \mulch{u_\nu}}} \\
 & = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
-& = - \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right)
+& = - \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \enspace .
 \end{align*}
-Equation~\ref{eqn:walshzero} therefore becomes:
-\begin{align*}
+Equation~\ref{eqn:walshzero} therefore becomes
+\begin{align}
 \Wa{f_{a,b}}(0)
-& = 1 - \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right)
-\end{align*}
+& = 1 - \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right) \enspace .
+\end{align}
 As Mesnager~\cite{DBLP:journals/dcc/Mesnager11} showed,
 the Hasse--Weil bound on $K_{m_1}(a)$ implies that,
 if $f_{a,b}$ is bent, then $\Wa{f_{a,b}}(0) = 2^{m_1}$

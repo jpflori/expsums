@@ -213,7 +213,7 @@ where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 We also define $f_a = f_{a,0}$ (corresponding to Dillon's monomial) and
 $g_b(x) = \tr{2}{b \mulch{x}}$.
 
-\section{Computing the Walsh spectrum}
+\section{Preliminaries}
 
 \subsection{Field of definition of the coefficients}
 
@@ -355,6 +355,8 @@ as noted by Mesnager~\cite{DBLP:journals/dcc/Mesnager11}.
 
 \section{Even case}
 
+\subsection{General extension degree}
+
 In this section, it is supposed that $\nu \geq 2$, \ie both $m_0$ and $m_1$ are even.
 The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$ and $\psi{u}$ does not depend on the value of $u_1$ (but only on that of $u_\nu$).
 
@@ -416,19 +418,19 @@ as an easy induction shows.
 
 The last sum (corresponding to $i = \nu$) can be split according to the value of
 $\mulch{u_\nu}$ as in Section~\ref{sec:odd}:
-\begin{align*}
+\begin{align}
 \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
 & = 2 \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)}
- - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \enspace ,
-\end{align*}
+ - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \enspace , \label{eqn:sumlast}
+\end{align}
 where the second term is easily shown to be
 \begin{align}
 - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0 }} \addch{f_a(u_1)}
 %& = - 2^{m_2} \cdots 2^{m_{\nu - 1}} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \\
-& = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace . \label{eqn:sumlast}
+& = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace . \label{eqn:sumeasy}
 \end{align}
 
-Equations~\ref{eqn:sumfirst}, \ref{eqn:summiddle} and \ref{eqn:sumlast} lead to the following expression for the Walsh transform at $\omega \neq 0$:
+Equations~\ref{eqn:sumfirst}, \ref{eqn:summiddle}, \ref{eqn:sumlast} and \ref{eqn:sumeasy} lead to the following expression for the Walsh transform at $\omega \neq 0$:
 \begin{align}
 \Wa{f_{a,b}}(\omega)
 & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \nonumber \\
@@ -438,97 +440,55 @@ Equations~\ref{eqn:sumfirst}, \ref{eqn:summiddle} and \ref{eqn:sumlast} lead to 
 & \qquad + 2^{m_{\nu} + 1} \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \nonumber \\
 & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - 2^{m_\nu} \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
 & \qquad - \left( \frac{2^{\left( 2^{\nu-1} - 2^{m_\nu} \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} + 2^{\left(2^{\nu - 1} - 1\right) m_\nu} \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
-& \qquad + 2^{m_{\nu} + 1} \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \enspace .
+& \qquad + 2^{m_{\nu} + 1} \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \enspace . \label{eqn:walshfull}
 \end{align}
+Unfortunately, the remaining sum
+\begin{align}
+\sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch{u_\nu} = 1}} \addch{f_a(u_1)} \label{eqn:gauss}
+\end{align}
+is hard to make explicit.
+Doing so is equivalent to evaluating a Gauss sum: an exponential sum involving
+a multiplicative and an additive character.
+In the next section, we manage to tackle the case $\nu = 2$ when $\omega \in \GF{m_1}^*$ (that is $w_1 = 1$) and conjecture a partial formula when $\omega \not\in \GF{m_1}^*$.
 
-\subsection{Initial step}
+\subsection{Four times an odd number}
 
-First suppose that $\nu = 2$, that is $m_2$ is odd and $3$ divides $2^{m_2} + 1$,
-so that $\frac{2^{m_0}-1}{3} = \left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}$.
+In this section, it is supposed that $\nu = 2$, \ie $m_0$ is four times the odd number $m_2$.
+
+For $\tr[m_2]{m_0}{u \omega}$ to be zero with $u_1 \neq w_1^{-1}$,
+$u_2$ must be $u_2 = \left( \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \right)^{-1}$
+so that Equation~\ref{eqn:gauss} becomes
 \begin{align*}
-\Wa{f_{a,b}}(\omega) & = 1 + \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*}  \addch{\tr{2}{b (u_2 y)^{(2^{m_1}+1) (2^{m_2}-1) \frac{2^{m_2}+1}{3}}}} \addch{\tr{m_0}{\omega u_1 u_2 y}} \\
-& = 1 + \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \sum_{y \in \GF{m_2}^*} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \addch{\tr{m_0}{\omega u_1 u_2 y}} \\
-& = 1 + \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \sum_{y \in \GF{m_2}^*} \addch{\tr{m_0}{\omega u_1 u_2 y}} \\
-& = 1 - \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad + \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \sum_{y \in \GF{m_2}} \addch{\tr{m_0}{\omega u_1 u_2 y}} \\
-& = 1 - \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad + 2^{m_2} \sum_{(u_1, u_2) \in U_1 \times U_2, \tr[m_2]{m_0}{u_1 u_2 \omega} = 0} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
+\sum_{u_1 \neq w_1^{-1}, \mulch{w_2 \tr[m_1]{m_0}{u_1 w_1}} = b} \addch{\tr{m_0}{a u_1^{-2}}} \\
 \end{align*}
+%Remark that
+%\begin{align*}
+%b \left( w_2^{-1} \tr[m_1]{m_0}{u_1 w_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} & = b \left( w_2^{-1} \left( u_1 w_1 + u_1^{-1}w_1^{-1} \right)^{-1} \right)^{\frac{2^{m_0}-1}{3}} \\
+%& = b w_2^{-\left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \left( u_1 w_1 + u_1^{-1}w_1^{-1} \right)^{- \left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \\
+%& = b w_2^{4 \frac{2^{m_2}+1}{3}} \left( u_1 w_1 + u_1^{-1}w_1^{-1} \right)^{- 2 \frac{2^{m_1}-1}{3}} \\
+%\end{align*}
 
-Remark that the second summand is easily computed as for $\omega = 0$:
-\begin{align*}
-- \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} & = - \frac{2^{m_2}+1}{3} \sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1}} \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
-& = \frac{2^{m_2}+1}{3} (1 - K_{m_1}(a)) \\
-\end{align*}
-
-The difficulty lies in computing the third summand (except when $\omega = 0$ where it is nothing but a multiple of the second summand).
-Decompose $\omega \neq 0$ as $\omega = \omega_1 \omega_2 o$ with $(\omega_1, \omega_2, o) \in U_1 \times U_2 \times \GF{m_2}^*$.
-Then $\tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2 o} = \tr[m_2]{m_0}{u_1 u_2 \omega_1 \omega_2} o$ and it is zero if and only if $u_1 = \omega_1^{-1}$, or $u_1 \neq \omega_1^{-1}$ and $u_2 \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \in \GF{m_2}^*$, that is $u_2$ is equal to the polar part of $\left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-1}$ which we denote by $u_2 \sim \left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-1}$.
-In particular $u_2^{\frac{2^{m_0}-1}{3}} = \left(\omega_2 \tr[m_1]{m_0}{u_1 \omega_1}\right)^{-\frac{2^{m_0}-1}{3}}$
-Hence
-\begin{align*}
-& \sum_{(u_1, u_2) \in U_1 \times U_2, \tr[m_2]{m_0}{u_1 u_2 \omega} = 0} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
-& = \addch{f_a(\omega_1^{-1})} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} \\
-& \qquad + \sum_{u_1 \neq \omega_1^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}}}} \\
-\end{align*}
-
-Then the first summand here is
-\begin{align*}
-\addch{f_a(\omega_1^{-1})} \sum_{u_2 \in U_2} \addch{\tr{2}{b u_2^{\frac{2^{m_0}-1}{3}}}} & = \frac{2^{m_2}+1}{3} \addch{f_a(\omega_1^{-1})} \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
-& = \frac{2^{m_2}+1}{3} \addch{f_a(\omega_1^{-1})} \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{c}} \\
-& = - \frac{2^{m_2}+1}{3} \addch{f_a(\omega_1^{-1})} \\
-\end{align*}
-so we are left with the second summand.
-
-This second summand reads
-\begin{align*}
-& \sum_{u_1 \neq \omega_1^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \addch{\tr{2}{b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}}}} \\
-& = \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& \qquad - \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} \neq 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& = 2 \sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} - \sum_{u_1 \neq \omega_1^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-\end{align*}
-
-The second summand is
-\begin{align*}
-\sum_{u_1 \neq \omega_1^{-1}} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} & = 1 - \addch{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} + \sum_{u_1 \neq 1} \addch{\tr{m_0}{a u_1^{2^{m_1}-1}}} \\
-& = 1 - \addch{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} + \sum_{u_1 \neq 1} \addch{\tr{m_0}{a u_1}} \\
-& = 1 - \addch{\tr{m_0}{a \omega_1^{1-2^{m_1}}}} - K_{m_1}(a) \\
-\end{align*}
-
-\subsubsection{The hard sum}
-
-We are left to compute
-\begin{align*}
-\sum_{u_1 \neq \omega_1^{-1}, b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} = 1} \addch{\tr{m_0}{a u_1^{-2}}} \\
-\end{align*}
-Remark that
-\begin{align*}
-b \left( \omega_2^{-1} \tr[m_1]{m_0}{u_1 \omega_1}^{-1} \right)^{\frac{2^{m_0}-1}{3}} & = b \left( \omega_2^{-1} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{-1} \right)^{\frac{2^{m_0}-1}{3}} \\
-& = b \omega_2^{-\left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{- \left( 2^{m_1} + 1 \right) \left( 2^{m_2} - 1 \right) \frac{2^{m_2}+1}{3}} \\
-& = b \omega_2^{4 \frac{2^{m_2}+1}{3}} \left( u_1 \omega_1 + u_1^{-1}\omega_1^{-1} \right)^{- 2 \frac{2^{m_1}-1}{3}} \\
-\end{align*}
-
-\paragraph{$\omega_1 = 1$:}
-We now suppose that $\omega_1 = 1$, that is $\omega \in \GF{m_1}^*$ rather than $\omega \in \GF{m_0}^*$ in full generality.
+\subsubsection{The subfield case: $w_1 = 1$}
+We now suppose that $w_1 = 1$, that is $\omega \in \GF{m_1}^*$ rather than $\omega \in \GF{m_0}^*$ in full generality.
 Then the sum is
 \begin{align*}
-\sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-1}}} \\
- & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_1}{a \left( u_1 + u_1^{-1} \right)}} \\
-& = 2 \sum_{t \in \T_1, t^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_1}{a t}} \\
+\sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-1}}} \\
+ & = \sum_{u_1 \neq 1, \left( u_1 + u_1^{-1} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_1}{a \left( u_1 + u_1^{-1} \right)}} \\
+& = 2 \sum_{t \in \T_{m_1}^1, t^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_1}{a t}} \\
 \end{align*}
 
 First notice that:
 \begin{align*}
-2 \sum_{t \in \T_1} \addch{\tr{m_1}{a t}} = - K_{m_1}(a) \\
+2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{a t}} = - K_{m_1}(a) \\
 \end{align*}
 
-Define $\gamma \in \GF[4]{}^*$ by $\gamma = b \omega_2^{4 \frac{2^{m_2}+1}{3}}$,
-let $c \in \GF[2]{m_1}^*$ be such that $\mulch(c) = \gamma$,
-$\alpha = \mulch(a)$,
+Define $\gamma \in \GF[4]{}^*$ by $\gamma = b w_2^{4 \frac{2^{m_2}+1}{3}}$,
+let $c \in \GF[2]{m_1}^*$ be such that $\mulch{c} = \gamma$,
+$\alpha = \mulch{a}$,
 and let $\beta \in \GF[4]{}^*$ be a primitive third root of unity.
 The sum can then be written as
 \begin{align*}
-2 \sum_{t \in \T_1, \mulch(t) = \gamma} \addch{\tr{m_1}{a t}} & = - \sum_{x \in \GF{m_1}^*, \mulch(x) = \gamma} \addch{\tr{m_1}{a x + 1/x}} + \sum_{x \in \GF{m_1}^*, \mulch(x) = \gamma} \addch{\tr{m_1}{a x}} \\
+2 \sum_{t \in \T_{m_1}^1, \mulch{t} = \gamma} \addch{\tr{m_1}{a t}} & = - \sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x + 1/x}} + \sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}} \\
 \end{align*}
 
 Let us now proceed with the first sum.
@@ -540,13 +500,13 @@ First remark that summing over the three possible values of $\gamma$ yields
 
 Moreover, one has
 \begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch(x) = \gamma} \addch{\tr{m_1}{a x + 1/x}}
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = \mulch(c)} \addch{\tr{m_1}{a x + 1/x}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{a c x + 1/\left( c x \right)}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{a c / x + x / c}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{a x / (a c) + a c / x}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = \mulch(1 / a c)} \addch{\tr{m_1}{a x + 1 / x}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = \alpha^2 \gamma^2} \addch{\tr{m_1}{a x + 1 / x}} \\
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x + 1/x}}
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{c}} \addch{\tr{m_1}{a x + 1/x}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c x + 1/\left( c x \right)}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c / x + x / c}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a x / (a c) + a c / x}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{1 / a c}} \addch{\tr{m_1}{a x + 1 / x}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \alpha^2 \gamma^2} \addch{\tr{m_1}{a x + 1 / x}} \\
 \end{align*}
 Therefore, the first sum takes the same value at $\gamma$ and $\alpha^2 \gamma^2$.
 As $\gamma$ lies in $\GF[4]{}^*$, this implies that the first sum takes the same value for $\gamma$ ranging over the two different elements of $\GF[4]{}^* \backslash \{ \alpha \}$.
@@ -554,19 +514,19 @@ If $\alpha = 1$, that is if $a$ is a cube, then this tells that the first sum ta
 
 Denote by $r$ a square root of $a$:
 \begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch(x) = \mulch(1/r)} \addch{\tr{m_1}{a x + 1/x}}
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{r \left( x + 1/x \right)}} \\
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{1/r}} \addch{\tr{m_1}{a x + 1/x}}
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{r \left( x + 1/x \right)}} \\
 & = \frac{\sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{r \left( x^3 + 1/x^3 \right)}}}{3} \\
 & = \frac{\sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{r D_3(x + 1/x)}}}{3} \\
-& = \frac{2 \sum_{t \in \T_0 \setminus \set{0, 1}} \addch{\tr{m_1}{r D_3(t)}} + 1}{3} \\
-& = \frac{2 \sum_{t \in \T_0} \addch{\tr{m_1}{r D_3(t)}} - 1}{3} \\
-& = \frac{2 \left( C_{m_1}(r, r) - \sum_{t \in \T_1} \addch{\tr{m_1}{r D_3(t)}} \right) - 1}{3} \\
-& = \frac{2 C_{m_1}(r, r) - 2 \sum_{t \in \T_1} \addch{\tr{m_1}{r t}} - 1}{3} \\
+& = \frac{2 \sum_{t \in \T_{m_1}^0 \setminus \set{0, 1}} \addch{\tr{m_1}{r D_3(t)}} + 1}{3} \\
+& = \frac{2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{r D_3(t)}} - 1}{3} \\
+& = \frac{2 \left( C_{m_1}(r, r) - \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r D_3(t)}} \right) - 1}{3} \\
+& = \frac{2 C_{m_1}(r, r) - 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r t}} - 1}{3} \\
 & = \frac{2 C_{m_1}(r, r) + K_{m_1}(r) - 1}{3} \\
 & = \frac{2 C_{m_1}(a, a) + K_{m_1}(a) - 1}{3} \\
 \end{align*}
 The possible values of $C_{m_1}(a, a)$ were determined by Carlitz~\cite{MR544577}.
-In our case where $m_1$ is even, they depend on $\mulch(a)$, and when $a$ is a cube,
+In our case where $m_1$ is even, they depend on $\mulch{a}$, and when $a$ is a cube,
 whether the cube root of $a$ has half-trace zero or not.
 
 For our interest, the most important fact is that Carlitz~\cite{MR544577} showed that
@@ -582,34 +542,34 @@ that is $u_0 = \sum_{i=0}^{(m_2-3)/2} b^{4^{2*i+2}} + \gamma$ for any $\gamma \i
 When $a$ is not a cube, then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
 where $u_0$ is the unique solution to $u^4 + u / a = 1$ also explicitly given by Carlitz~\cite{MR544577}:
 %$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-$u_0 = \mulch(a) \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+$u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
 
 Therefore, in the case where $K_{m_1}(a) \equiv 1 \pmod{3}$, which includes the case we are ultimately interested in, $K_{m_1}(a) = 4$, the above equality becomes for $\gamma = 1/r = 1$:
 \begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{a x + 1/x}}
+\sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a x + 1/x}}
 & = \frac{K_{m_1}(a) - 1}{3} \\
 \end{align*}
 Using the other equalities, it becomes evident that the first sum also takes the same value for $\gamma \neq 1$.
 
 The second sum can also be made explicit using results of Carlitz~\cite{MR544577}.
 \begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch(x) = \gamma} \addch{\tr{m_1}{a x}}
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = \mulch(c)} \addch{\tr{m_1}{a x}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch(x) = 1} \addch{\tr{m_1}{a c x}} \\
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}}
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{c}} \addch{\tr{m_1}{a x}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c x}} \\
 & = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a c x^3}} \\
 & = \frac{1}{3} C_{m_1}(a c, 0) \\
 \end{align*}
 As $m_1$ is even, this becomes
 \begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch(x) = \gamma} \addch{\tr{m_1}{a x}}
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}}
 & = \left\{
 \begin{array}{ll}
-\frac{-1 + (-1)^{m_2-1} 2^{m_2+1}}{3} & \text{if } \mulch(a c) = 1 \\
-\frac{-1 + (-1)^{m_2} 2^{m_2}}{3} & \text{if } \mulch(a c) \neq 1 \\
+\frac{-1 + (-1)^{m_2-1} 2^{m_2+1}}{3} & \text{if } \mulch{a c} = 1 \\
+\frac{-1 + (-1)^{m_2} 2^{m_2}}{3} & \text{if } \mulch{a c} \neq 1 \\
 \end{array}
 \right. \\
 \end{align*}
-In particular, its value only depends on $\mulch(a c) = \alpha \gamma$.
+In particular, its value only depends on $\mulch{a c} = \alpha \gamma$.
 
 To summarize, supposing that $K_{m_1}(a) \equiv 1 \pmod{3}$, one has
 \begin{align*}
@@ -617,15 +577,15 @@ To summarize, supposing that $K_{m_1}(a) \equiv 1 \pmod{3}$, one has
 \end{align*}
 and so that
 \begin{align*}
-& \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
-& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{b \omega_2^{4 \frac{2^{m_2}+1}{3}}}} \right) 2^{m_2-1} \\
+& \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
+& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{b w_2^{4 \frac{2^{m_2}+1}{3}}}} \right) 2^{m_2-1} \\
 \end{align*}
 
-\paragraph{$\omega_1 \neq 1$:}
-Going back to the case $\omega_1 \neq 1$, \ie $\omega \in \GF{m_0}^*$, and supposing again that $K_{m_1}(a) \equiv 1 \pmod{3}$, the following seems to be true experimentally:
+\subsection{A conjectural formula: $w_1 \neq 1$}
+Going back to the case $w_1 \neq 1$, \ie $\omega \in \GF{m_0}^*$, and supposing again that $K_{m_1}(a) \equiv 1 \pmod{3}$, the following seems to be true experimentally:
 \begin{align*}
-& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
-& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \addch{\tr{m_0}{a \omega_1^2}} \right) \frac{2^{m_2-1} - 1}{3} \\
+& \sum_{u_1 \neq w_1^{-1}, \left( (u_1 w_1)^2 + (u_1 w_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
+& \qquad = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \addch{\tr{m_0}{a w_1^2}} \right) \frac{2^{m_2-1} - 1}{3} \\
 \end{align*}
 
 Assuming $K_{m_1}(a) \equiv 1 \pmod{3}$ and the above formula for the sum is correct and plugging it into Parseval equality yields the following equality:
@@ -633,24 +593,24 @@ Assuming $K_{m_1}(a) \equiv 1 \pmod{3}$ and the above formula for the sum is cor
 \sum_{x \in \GF{m_0}^*} \addch{\tr{??}{??}} & = \frac{2^{m_1} - 1}{3} \left( K_{m_1}(a) - 1 \right) \\
 & = \Wa{f_{a,b}}(0) - 1 \\
 \end{align*}
-This is supported by experimental evidence that there are exactly $2^{m_1 - 1} + 5 \frac{K_{m_1}(a) - 4}{6} + 3$ (respectively $2^{m_1 - 1} - \frac{K_{m_1}(a) - 4}{6}$) values of $\omega_1 \in U_1$ such that the mysterious trace is zero when $b \mulch(\omega_2) = 1$ (respectively $b \mulch(\omega_2) \neq 1$).
+This is supported by experimental evidence that there are exactly $2^{m_1 - 1} + 5 \frac{K_{m_1}(a) - 4}{6} + 3$ (respectively $2^{m_1 - 1} - \frac{K_{m_1}(a) - 4}{6}$) values of $w_1 \in U_1$ such that the mysterious trace is zero when $b \mulch{w_2} = 1$ (respectively $b \mulch{w_2} \neq 1$).
 
 
 %Indeed
 %\begin{align*}
-%& \sum_{u_1 \neq \omega_1^{-1}, \left( (u_1 \omega_1)^2 + (u_1 \omega_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
-%& \qquad = \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b \omega_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2} \omega_1^2}} \\
+%& \sum_{u_1 \neq w_1^{-1}, \left( (u_1 w_1)^2 + (u_1 w_1)^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2}}} \\
+%& \qquad = \sum_{u_1 \neq 1, \left( u_1^2 + u_1^{-2} \right)^{\frac{2^{m_1}-1}{3}} = b w_2^{4 \frac{2^{m_2}+1}{3}}} \addch{\tr{m_0}{a u_1^{-2} w_1^2}} \\
 %& \ldots
 %\end{align*}
 
-\subsubsection{Summing back}
+\subsubsection{An explicit expression for the Walsh transform}
 
 In the end we get the following (conjectured) formula when $K_{m_1}(a) \equiv 1 \pmod{3}$ and $\omega \neq 0$:
 \begin{align*}
 \Wa{f_{a,b}}(\omega)
-& = 1 + \frac{2^{m_2} + 1}{3} \left(1 - 2^{m_2} \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad - 2^{m_2} \left(1 - \addch{f_a(\omega_1^{-1})} - K_{m_1}(a) \right) \\
-& \qquad + 2^{m_2 + 1} \left( \frac{2^{m_2 + 1} - K_{m_1}(a)}{3}  - \left( 1 - \addch{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \addch{f_a(\omega_1^{-1})} \right) \frac{2^{m_2-1} - 1}{3} \right) \\
+& = 1 + \frac{2^{m_2} + 1}{3} \left(1 - 2^{m_2} \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad - 2^{m_2} \left(1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \\
+& \qquad + 2^{m_2 + 1} \left( \frac{2^{m_2 + 1} - K_{m_1}(a)}{3}  - \left( 1 - \addch{\tr{??}{??}} \right) 2^{m_2-1} - \left( 1 - \addch{f_a(w_1^{-1})} \right) \frac{2^{m_2-1} - 1}{3} \right) \\
 & = 2^{m_1} \addch{\tr{??}{??}} + \frac{4 - K_{m_1}(a)}{3}
 \end{align*}
 

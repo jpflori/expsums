@@ -263,7 +263,7 @@ The sum ranging over $\GF{m_\nu}^*$ is equal to $-1$ when $\tr[m_\nu]{m_0}{\omeg
 
 When $\omega = 0$, the Walsh transform is
 \begin{align}
-\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_1} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshzero}
+\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_\nu} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshzero}
 \end{align}
 
 When $\omega \in \GF{m_0}^*$, write its polar decomposition $\omega = w_1 \cdots w_\nu o = w o$ where $(w_1, \ldots, w_\nu, o) \in U_1 \times \cdots U_\nu \times \GF{m_\nu}^*$ and $w = w_1 \cdots w_\nu$.
@@ -356,23 +356,30 @@ as noted by Mesnager~\cite{DBLP:journals/dcc/Mesnager11}.
 \section{Even case}
 
 In this section, it is supposed that $\nu \geq 2$, \ie both $m_0$ and $m_1$ are even.
-The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$.
+The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$ and $\psi{u}$ does not depend on the value of $u_1$ (but only on that of $u_\nu$).
 
-Equation~\ref{eqn:walshzero}
+In particular, the computation of $\sum_{u \in U} f_{a,b}(u)$ is straightforward:
+\begin{align*}
+\sum_{u \in U} f_{a,b}(u)
+& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \sum_{u_1 \in U_1} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{\tr{2}{b \mulch{u_\nu}}} \\
+& = \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
+& = - \prod_{i=2}^{\nu-1} \left( 2^{m_i}+1 \right) \frac{2^{m_\nu} + 1}{3} \left( 1 - K_{m_1}(a) \right)
+\end{align*}
+Equation~\ref{eqn:walshzero} therefore becomes:
+\begin{align*}
+\Wa{f_{a,b}}(0)
+& = 1 - \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right)
+\end{align*}
+As Mesnager~\cite{DBLP:journals/dcc/Mesnager11} showed,
+the Hasse--Weil bound on $K_{m_1}(a)$ implies that,
+if $f_{a,b}$ is bent, then $\Wa{f_{a,b}}(0) = 2^{m_1}$
+and so $K_{m_1}(a) = 4$.
 
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b u ^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}} y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
 & = 1 + \sum_{u \in U_1} \sum_{y \in \GF{m_1}^*} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
 & = 1 + \sum_{u \in U_1} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \addch{\tr{m_0}{\omega u y}} \\
 \end{align*}
-
-When $\omega = 0$, we have
-\begin{align*}
-\Wa{f_{a,b}}(0) & = 1 + \sum_{u \in U_1} \addch{\tr{m_0}{a u^{2^{m_1}-1}}} \sum_{y \in \GF{m_1}^*}  \addch{\tr{2}{b y^{(2^{m_1}+1) \frac{2^{m_1}-1}{3}}}} \\
-& = 1 + \frac{2^{m_1} - 1}{3} \left( 1 - K_{m_1}(a) \right) \sum_{c \in \GF[4]{}^*} \addch{\tr{2}{b c}} \\
-& = 1 + \frac{2^{m_1} - 1}{3} \left( K_{m_1}(a) - 1 \right)
-\end{align*}
-For $f_{a,b}$ to be bent, we must have $\Wa{f_{a,b}}(0) = 2^{m_1}$  because of the Hasse--Weil bound on $K_{m_1}(a)$ which leads to $K_{m_1}(a) = 4$ as Mesnager has already shown.
 
 When $\omega \neq 0$, we only get
 \begin{align*}

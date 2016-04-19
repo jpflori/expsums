@@ -169,51 +169,137 @@ conjectured by Mesnager for extensions of degree four times an odd number.
 
 \section{Notation}
 
+\subsection{Field trace}
+
+For extension degrees $m$ and $n$ such that $m$ divides $n$,
+the field trace from $\GF{m}$ down to $\GF{n}$ is denoted by $\tr[m]{n}{x}$.
+
+\subsection{Polar decomposition}
+
 Let $n \geq 2$ be an even integer and
 $\nu \geq 1$ denote its $2$-valuation.
 We denote by $m_i$ for $0 \leq i \leq \nu$ the integer $n / 2^i$,
 \eg $m_0 = n$ and $m_\nu = m$ with the notation of the previous section.
 
-For $0 \leq i < \nu$,  the extension degree of $\GF{m_i}$ is even and
-it multiplicative group  $\GF{m_i}^*$ can be split using the so-called
-polar decomposition
-\[
-\GF{m_i}^* \simeq U_{i+1} \times \GF{m_{i+1}}^* \enspace ,
-\]
+For $0 \leq i < \nu$, the multiplicative group  $\GF{m_i}^*$
+can be split using the so-called polar decomposition
+\begin{align*}
+\GF{m_i}^* & \simeq U_{i+1} \times \GF{m_{i+1}}^* \enspace ,
+\end{align*}
 where $U_{i+1} \subset \GF{m_i}^*$ is the subgroup of $2^{m_{i+1}}+1$-th roots of unity
 and $\GF{m_{i+1}}^*$ the subgroup of $2^{m_{i+1}}-1$-th roots of unity.
-Therefore, $\GF{m_0}^*$ can be recursively decomposed as
-\[
-\GF{m_0}^* \simeq U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* \enspace .
-\]
+Repeating this construction, $\GF{m_0}^*$ can be decomposed as
+\begin{align*}
+\GF{m_0}^* & \simeq U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* \enspace .
+\end{align*}
 Let $U$ denote the image of $U_1 \times \cdots \times U_\nu$ within $\GF{m_0}^*$,
 that is the set of $(2^{m_1}+1) \cdots (2^{m_\nu}+1)$-th roots of unity.
 Then $\GF{m_0}^*$ can be decomposed as
+\begin{align*}
+\GF{m_0}^* & \simeq U \times \GF{m_\nu}^* \enspace .
+\end{align*}
+
+Remark that $3$ divides $2^{m_\nu}+1$ and is coprime with $2^{m_\nu}-1$ and $2^{m_i}+1$ for $0 \leq i < \nu$.
+Therefore the function $x \mapsto x^3$ is a permutation of $\GF{m_\nu}^*$ and
+$U_i$ for $1 \leq i < \nu$, and $3$-to-$1$ on $U_\nu$.
+
+\subsection{Hilbert 90 Theorem}
+
+For $1 \leq i \leq \nu$ and $j \in \GF{}$, let $\T_{m_i}^j$ be the set
+\begin{align*}
+\T_{m_i}^j & = \set{x \in \GF{m_i}, \tr{m_i}{x^{-1}} = j}
+\end{align*}
+of elements of $\GF{m_i}$ whose inverses have trace $j$
+(defining $0^{-1}$ to be $0$).
+
+Hilbert 90 Theorem states that the function $x \mapsto x + x^{-1}$ is
+$2$-to-$1$ from $U_i \backslash \set{1}$ to $\T_{m_i}^1$
+and from $\GF{m_i}^* \backslash \set{1}$ to $\T_{m_i}^0$
+(and both $0$ and $1$ are sent onto $0$).
+
+\subsection{Dickson polynomials}
+
+Let $D_3(x) = x^3 + x$ be the third Dickson polynomial of the first kind.
+A notable property of $D_3$ is that $D_3(x + x^{-1}) = x^3 + x^{-3}$.
+It implies in particular that $D_3$ induces a permutation of $\T_{m_1}^0$
+when $m_1$ is odd and of $\T_{m_1}^1$ when $m_1$ is even.
+
+\subsection{Characters}
+
+The non-principal quadratic additive character $\addch{}$ of $\GF{}$
+together with the field trace can be used to construct all quadratic additive
+characters of $\GF{m}$ for any extension degree $m$.
+
+The non-principal cubic multiplicative character $\mulch{}$ of $\GF{m}$
+for any even extension degree $m$ is defined as
 \[
-\GF{m_0}^* \simeq U \times \GF{m_\nu}^* \enspace .
+\mulch{x} = x^{\frac{2^{m}-1}{3}} \enspace ,
 \]
-Remark that $3$ divides $2^{m_\nu}+1$ and is coprime with $2^{m_\nu}+1$ and $2^{m_i}+1$ for $0 \leq i < \nu$.
+where $x \in \GF{m}$.
 
-%For extension degrees $k$ and $l$ such that $k$ divides $l$,
-%the field trace from $\GF{l}$ down to $\GF{k}$ is denoted by $\tr[k]{l}{x}$.
+\subsection{Walsh transform}
 
-The non-principal additive character of $\GF{}$ is denoted $\addch{}$
-and the Walsh transform of a Boolean function $f$ at $\omega \in \GF{m_0}$ is
+The Walsh transform of a Boolean function $f$ at $\omega \in \GF{m_0}$ is
 \begin{align*}
 \Wa{f}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f(x) + \tr{m_0}{\omega x}} \enspace ,
 \end{align*}
 and $f$ is bent if and only if $\Wa{f}(\omega) = 2^{\pm m_1}$ for all $\omega \in \GF{m_0}$.
 
-The Kloosterman sum of $a \in \GF{m_1}$ is
-\[
-K_{m_1}(a) = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x + \frac{1}{x}}} \enspace .
-\]
+\subsection{Kloosterman sums}
 
-The non-principal cubic multiplicative character $\mulch{}$ is defined as
-\[
-\mulch{x} = x^{\frac{2^{m_0}-1}{3}} \enspace ,
-\]
-for $x \in \GF{m_0}$.
+For $a \in \GF{m_1}$, the Kloosterman sum $K_{m_1}(a)$ is
+\begin{align*}
+K_{m_1}(a) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x + \frac{1}{x}}} \enspace .
+\end{align*}
+It is a well known result that
+\begin{align*}
+\sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1}} & = 1 - K_{m_1}(a) \enspace .
+\end{align*}
+
+\subsection{Cubic sums}
+
+For $a, b \in \GF{m_1}$, the cubic sum $C_{m_1}(a, b)$ is
+\begin{align*}
+C_{m1}(a, b) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x^3 + b x}}
+\end{align*}
+The possible values of $C_{m_1}(a, b)$ were determined by Carlitz~\cite{MR544577}
+together with simple criteria involving $a$ and $b$.
+
+The most important consequence of Carlitz's results in our context
+is that $C_{m_1}(a, a) = 0$ if and only if
+\begin{itemize}
+\item $\tr{m_1}{\alpha} = 0$ for $\alpha \in \GF{m_1}^*$ such that $a = \alpha^3$
+when $m_1$ is odd (in that case $a$ is always a cube);
+\item and when there exists $\alpha \in \GF{m_1}^*$ such that $a = \alpha^3$
+(that is $a$ is a cube and $\mulch{a} = 1$)
+and $\tr[2]{m_1}{\alpha} \neq 0$ (that is the cube root half-trace is non zero)
+when $m_1$ is even.
+\end{itemize}
+Charpin \etal later deduced that both in the odd case~\cite{mod24}
+and in the even case~\cite{4595463,DBLP:journals/dm/CharpinHZ09}
+these conditions are equivalent to $K_{m_1}(a) \equiv 1 \pmod{3}$.
+
+For completeness, the other possible values for $C_{m_1}(a, a)$ when $m_1$ is even follow.
+When $a$ is a cube and $\tr[2]{m_1}{\alpha} = 0$, then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
+where $u_0$ is any solution to $u^4 + u = \alpha^4$,
+that is $u_0 = \sum_{i=0}^{(m_2-3)/2} \alpha^{4^{2*i+2}} + \gamma$ for any $\gamma \in \GF[4]{}$.
+When $a$ is not a cube, then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
+where $u_0$ is the unique solution to $u^4 + u / a = 1$ also explicitly given by Carlitz~\cite{MR544577}:
+%$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+$u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+
+Finally, the following result on $C_{m_1}(a, 0)$ when $m_1 = 2 m_2$ is even will also be used:
+\begin{align*}
+C_{m_1}(a, 0)
+& = \left\{
+\begin{array}{ll}
+(-1)^{m_2+1} 2^{m_2+1} & \text{if } \mulch{a} = 1 \\
+(-1)^{m_2} 2^{m_2} & \text{if } \mulch{a} \neq 1 \\
+\end{array}
+\right.
+\end{align*}
+
+\subsection{Boolean functions}
 
 The Boolean functions $f_{a,b}$ studied in this note are defined over $\GF{m_0}$
 and given in binomial form:
@@ -222,6 +308,7 @@ f_{a,b}(x) & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \\
 & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b \mulch{x}} \enspace ,
 \end{align*}
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
+
 We also define $f_a = f_{a,0}$ (corresponding to Dillon's monomial) and
 $g_b(x) = \tr{2}{b \mulch{x}}$.
 
@@ -356,8 +443,8 @@ and for $\omega \neq 0$:
 \right.
 \end{align}
 
-The values of $C_{m_1}(a, a)$ were computed by Carlitz~\cite{MR544577}
-and yield a concise and easy to compute formula for the Walsh spectrum
+The values of $C_{m_1}(a, a)$ computed by Carlitz~\cite{MR544577}
+yield a concise and easy to compute formula for the Walsh spectrum
 of $f_{a,b}$.
 Moreover, Charpin \etal~\cite{4595463,DBLP:journals/dm/CharpinHZ09} derived from Carlitz's results
 that $C_{m_1}(a, a) = 0$ if and only if $K_{m_1}(a) \equiv 1 \pmod{3}$.
@@ -537,26 +624,8 @@ Denote by $r$ a square root of $a$:
 & = \frac{2 C_{m_1}(r, r) + K_{m_1}(r) - 1}{3} \\
 & = \frac{2 C_{m_1}(a, a) + K_{m_1}(a) - 1}{3} \\
 \end{align*}
-The possible values of $C_{m_1}(a, a)$ were determined by Carlitz~\cite{MR544577}.
-In our case where $m_1$ is even, they depend on $\mulch{a}$, and when $a$ is a cube,
-whether the cube root of $a$ has half-trace zero or not.
 
-For our interest, the most important fact is that Carlitz~\cite{MR544577} showed that
-$C_{m_1}(a, a) = 0$ if and only if there exists $b \in \GF{m_1}^*$ such that $a = b^3$ (that is $a$ is a cube)
-and $\tr[2]{m_1}{b} \neq 0$ (that is the cube root half-trace is non zero),
-and that Charpin \etal~\cite{4595463,DBLP:journals/dm/CharpinHZ09} later deduced that 
-these conditions are equivalent to $K_{m_1}(a) \equiv 1 \pmod{3}$.
-
-For completeness, the other possibilities given by Carlitz~\cite{MR544577} follow.
-When $a$ is a cube and $\tr[2]{m_1}{b} = 0$, then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
-where $u_0$ is any solution to $u^4 + u = b^4$,
-that is $u_0 = \sum_{i=0}^{(m_2-3)/2} b^{4^{2*i+2}} + \gamma$ for any $\gamma \in \GF[4]{}$.
-When $a$ is not a cube, then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
-where $u_0$ is the unique solution to $u^4 + u / a = 1$ also explicitly given by Carlitz~\cite{MR544577}:
-%$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-$u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-
-Therefore, in the case where $K_{m_1}(a) \equiv 1 \pmod{3}$, which includes the case we are ultimately interested in, $K_{m_1}(a) = 4$, the above equality becomes for $\gamma = 1/r = 1$:
+In the case where $K_{m_1}(a) \equiv 1 \pmod{3}$, which includes the case we are ultimately interested in, $K_{m_1}(a) = 4$, $C_{m_1}(a, a) = 0$ and the above equality becomes for $\gamma = 1/r = 1$:
 \begin{align*}
 \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a x + 1/x}}
 & = \frac{K_{m_1}(a) - 1}{3} \\

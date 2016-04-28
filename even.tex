@@ -50,9 +50,9 @@
 \newcommand{\addch}[1]{\ifthenelse{\isempty{#1}}%
   {\chi}%
   {\chi \left( #1 \right)}}
-\newcommand{\mulch}[1]{\ifthenelse{\isempty{#1}}%
-  {\psi}%
-  {\psi \left( #1 \right)}}
+\newcommand{\mulch}[2][m_1]{\ifthenelse{\isempty{#2}}%
+  {\psi_{#1}}%
+  {\psi_{#1} \left( #2 \right)}}
 \makeatother
 \newcommand{\Wa}[1]{\widehat{\chi_{#1}}}
 
@@ -144,20 +144,20 @@ $f_{a,b}$ is (hyper-)bent if and only if $K_m(a) = 4$.
 Unfortunately, the proof does not extend to the case where $m$ is even.
 Nonetheless, it is easy to show that $K_m(a) = 4$ is still a necessary
 condition for $f_{a,b}$ to be bent in this latter case
-(but note that $f_{a,b}$ can not hyper-bent in that case)
-and it was conjectured to be sufficient condition.
+(but note that $f_{a,b}$ can no longer be hyper-bent).
 Further experimental evidence gathered by Flori, Mesnager
-and Cohen~\cite{DBLP:journals/iacr/FloriMC11} supported this conjecture:
+and Cohen~\cite{DBLP:journals/iacr/FloriMC11} supported the conjecture
+that it should also be a sufficient condition:
 for $m$ up to $16$, $f_{a,b}$ is bent if and only if $K_m(a) = 4$.
 
 In this note, the polar decomposition of fields of even extension degree
-$n = 2^\nu m$ is used to reduce the evaluation of the Walsh transform
+$n = 2^\nu m$ with $m$ odd is used to reduce the evaluation of the Walsh transform
 of $f_{a,b}$ at $\omega \in \GF{n}^*$ to that of a Gauss sum of the form
 \begin{align*}
-\sum_{u \in U} \mulch{b \tr[m]{n}{\omega u}} \addch{\tr{n}{a u^{2^{2^{\nu-1}m}-1}}} \enspace ,
+\sum_{u \in U} \mulch[n]{b \tr[m]{n}{\omega u}} \addch{\tr{n}{a u^{2^{2^{\nu-1}m}-1}}} \enspace ,
 \end{align*}
 where $\GF{n}^*$ is decomposed as $\GF{n}^* \simeq U \times \GF{m}^*$,
-$\mulch{}$ is a cubic multiplicative character
+$\mulch[n]{}$ is a cubic multiplicative character
 and $\addch{}$ a quadratic additive character.
 In the case of extensions of degree four times an odd number,
 that is when $m$ is twice an odd number,
@@ -168,6 +168,7 @@ In particular, the validity of this formula would prove the characterization
 conjectured by Mesnager for extensions of degree four times an odd number.
 
 \section{Notation}
+\label{sec:notation}
 
 \subsection{Field trace}
 
@@ -214,10 +215,11 @@ of elements of $\GF{m_i}$ whose inverses have trace $j$
 
 Hilbert 90 Theorem states that the function $x \mapsto x + x^{-1}$ is
 $2$-to-$1$ from $U_i \backslash \set{1}$ to $\T_{m_i}^1$
-and from $\GF{m_i}^* \backslash \set{1}$ to $\T_{m_i}^0$
+and from $\GF{m_i}^* \backslash \set{1}$ to $\T_{m_i}^0 \backslash \set{0}$
 (and both $0$ and $1$ are sent onto $0$).
 
 \subsection{Dickson polynomials}
+\label{sec:dickson}
 
 Let $D_3(x) = x^3 + x$ be the third Dickson polynomial of the first kind.
 A notable property of $D_3$ is that $D_3(x + x^{-1}) = x^3 + x^{-3}$.
@@ -228,65 +230,80 @@ when $m_1$ is odd and of $\T_{m_1}^1$ when $m_1$ is even.
 
 The non-principal quadratic additive character $\addch{}$ of $\GF{}$
 together with the field trace can be used to construct all quadratic additive
-characters of $\GF{m}$ for any extension degree $m$.
+characters of $\GF{m_i}$ for any $0 \leq i \leq \nu$.
 
-The non-principal cubic multiplicative character $\mulch{}$ of $\GF{m}$
-for any even extension degree $m$ is defined as
+The non-principal cubic multiplicative character $\mulch[m_i]{}$ of $\GF{m_i}$
+for any $0 \leq i < \nu$ is defined for $x \in \GF{m_i}$ as
 \[
-\mulch{x} = x^{\frac{2^{m}-1}{3}} \enspace ,
+\mulch[m_i]{x} = x^{\frac{2^{m_i}-1}{3}} \enspace .
 \]
-where $x \in \GF{m}$.
+Note that if $x$ lives in a subextension,
+that is $x \in \GF{m_{i+j}}$ with $0 \leq j < \nu - i$, then
+\[
+\mulch[m_i]{x} = \mulch[m_{i+j}]{x}^{2^j} \enspace .
+\]
 
 \subsection{Walsh transform}
 
 The Walsh transform of a Boolean function $f$ at $\omega \in \GF{m_0}$ is
 \begin{align*}
-\Wa{f}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f(x) + \tr{m_0}{\omega x}} \enspace ,
+\Wa{f}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f(x) + \tr{m_0}{\omega x}} \enspace .
 \end{align*}
-and $f$ is bent if and only if $\Wa{f}(\omega) = 2^{\pm m_1}$ for all $\omega \in \GF{m_0}$.
+The function $f$ is bent if and only if $\Wa{f}(\omega) = 2^{\pm m_1}$
+for all $\omega \in \GF{m_0}$.
 
 \subsection{Kloosterman sums}
+\label{sec:kloo}
 
 For $a \in \GF{m_1}$, the Kloosterman sum $K_{m_1}(a)$ is
 \begin{align*}
-K_{m_1}(a) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x + \frac{1}{x}}} \enspace .
+K_{m_1}(a) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x + x^{-1}}} \enspace .
 \end{align*}
 It is a well known result that
 \begin{align*}
-\sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1}} & = 1 - K_{m_1}(a) \enspace .
+\sum_{u_1 \in U_1} \addch{\tr{m_0}{a u_1}}
+& = 1 + 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{a t}} \\
+& = 1 - 2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{a t}} \\
+& = 1 - K_{m_1}(a) \enspace .
 \end{align*}
 
 \subsection{Cubic sums}
+\label{sec:cubic}
 
 For $a, b \in \GF{m_1}$, the cubic sum $C_{m_1}(a, b)$ is
 \begin{align*}
-C_{m1}(a, b) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x^3 + b x}}
+C_{m_1}(a, b) & = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a x^3 + b x}}
 \end{align*}
 The possible values of $C_{m_1}(a, b)$ were determined by Carlitz~\cite{MR544577}
 together with simple criteria involving $a$ and $b$.
 
 The most important consequence of Carlitz's results in our context
-is that $C_{m_1}(a, a) = 0$ if and only if
+is that $C_{m_1}(a, a) = \sum_{x \in \GF{m_1}} \addch{\tr{m_1}{a D_3(x)}} = 0$ if and only if
 \begin{itemize}
 \item $\tr{m_1}{\alpha} = 0$ for $\alpha \in \GF{m_1}^*$ such that $a = \alpha^3$
 when $m_1$ is odd (in that case $a$ is always a cube);
 \item and when there exists $\alpha \in \GF{m_1}^*$ such that $a = \alpha^3$
 (that is $a$ is a cube and $\mulch{a} = 1$)
-and $\tr[2]{m_1}{\alpha} \neq 0$ (that is the cube root half-trace is non zero)
+and $\tr[2]{m_1}{\alpha} \neq 0$ (that is the cube root's half-trace is non zero)
 when $m_1$ is even.
 \end{itemize}
 Charpin \etal later deduced that both in the odd case~\cite{DBLP:journals/jct/CharpinHZ07}
 and in the even case~\cite{4595463,DBLP:journals/dm/CharpinHZ09}
 these conditions are equivalent to $K_{m_1}(a) \equiv 1 \pmod{3}$.
 
-For completeness, the other possible values for $C_{m_1}(a, a)$ when $m_1$ is even follow.
-When $a$ is a cube and $\tr[2]{m_1}{\alpha} = 0$, then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
+For completeness, the other possible values for $C_{m_1}(a, a)$ when $m_1$ is even follow:
+\begin{itemize}
+\item When $a$ is a cube and $\tr[2]{m_1}{\alpha} = 0$,
+then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
 where $u_0$ is any solution to $u^4 + u = \alpha^4$,
-that is $u_0 = \sum_{i=0}^{(m_2-3)/2} \alpha^{4^{2*i+2}} + \gamma$ for any $\gamma \in \GF[4]{}$.
-When $a$ is not a cube, then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
-where $u_0$ is the unique solution to $u^4 + u / a = 1$ also explicitly given by Carlitz~\cite{MR544577}:
+that is $u_0 = \sum_{i=0}^{(m_2-3)/2} \alpha^{4^{2*i+2}} + \gamma$
+for any $\gamma \in \GF[4]{}$.
+\item When $a$ is not a cube,
+then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
+where $u_0$ is the unique solution to $u^4 + u / a = 1$,
+that is $u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
 %$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-$u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+\end{itemize}
 
 Finally, the following result on $C_{m_1}(a, 0)$ when $m_1 = 2 m_2$ is even will also be used:
 \begin{align*}
@@ -305,12 +322,12 @@ The Boolean functions $f_{a,b}$ studied in this note are defined over $\GF{m_0}$
 and given in binomial form:
 \begin{align*}
 f_{a,b}(x) & = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b x^{\frac{2^{m_0}-1}{3}}} \\
-& = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b \mulch{x}} \enspace ,
+& = \tr{m_0}{a x^{2^{m_1}-1}} + \tr{2}{b \mulch[m_0]{x}} \enspace ,
 \end{align*}
 where $a \in \GF{m_0}$ and $b \in \GF[4]{}^*$.
 
 We also define $f_a = f_{a,0}$ (corresponding to Dillon's monomial) and
-$g_b(x) = \tr{2}{b \mulch{x}}$.
+$g_b(x) = \tr{2}{b \mulch[m_0]{x}}$.
 
 \section{Preliminaries}
 
@@ -344,8 +361,10 @@ From now on we can suppose that $a \in \GF{m_1}^*$ without loss of generality.
 
 \subsection{Polar decomposition}
 
-We now start splitting the Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$ using the polar decomposition of $\GF{m_0}^*$ as $\GF{m_0}^* = U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* = U \times \GF{m_\nu}^*$.
-We write $x \in \GF{m_0}^*$ as $x = u_1 \cdots u_\nu y = u y$ for $u_i \in U_i$, $u = u_1 \cdots u_\nu \in U$, and $y \in \GF{m_\nu}^*$.
+We now start splitting the Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$
+using the polar decomposition of $\GF{m_0}^*$ as $\GF{m_0}^* = U_1 \times \cdots \times U_\nu \times \GF{m_\nu}^* = U \times \GF{m_\nu}^*$.
+We write $x \in \GF{m_0}^*$ as $x = u_1 \cdots u_\nu y = u y$ for $u_i \in U_i$,
+$u = u_1 \cdots u_\nu \in U$, and $y \in \GF{m_\nu}^*$.
 The Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$ can then be written
 \begin{align*}
 \Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
@@ -364,9 +383,9 @@ When $\omega = 0$, the Walsh transform is
 \Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_\nu} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshzero}
 \end{align}
 
-When $\omega \in \GF{m_0}^*$, write its polar decomposition $\omega = w_1 \cdots w_\nu o = w o$ where $(w_1, \ldots, w_\nu, o) \in U_1 \times \cdots U_\nu \times \GF{m_\nu}^*$ and $w = w_1 \cdots w_\nu$.
-Then $\tr[m_\nu]{m_0}{\omega u} = 0$ if and only if there exists $1 \leq i \leq \nu$
-such that $u_i = w_i^{-1}$.
+When $\omega \in \GF{m_0}^*$, write its polar decomposition $\omega = w_1 \cdots w_\nu o = w o$
+where $(w_1, \ldots, w_\nu, o) \in U_1 \times \cdots U_\nu \times \GF{m_\nu}^*$
+and $w = w_1 \cdots w_\nu \in U$.
 The Walsh transform is then
 \begin{align}
 \Wa{f_{a,b}}(\omega) & = 1 - \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} \neq 0} \addch{f_{a,b}(u)} + (2^{m_\nu} - 1) \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \nonumber \\
@@ -377,7 +396,10 @@ To go further, the cases $\nu = 1$ and $\nu \geq 2$ have to be dealt with separa
 \section{Odd case}
 \label{sec:odd}
 
-In this section, it is supposed that $\nu = 1$, \ie $m_1$ is odd and $U = U_1$, which is the case that Mesnager settled~\cite{DBLP:journals/dcc/Mesnager11} and that is recalled here for completeness and because it inspired the treatment of the general case.
+In this section, it is supposed that $\nu = 1$, \ie $m_1$ is odd and $U = U_1$,
+which is the case that Mesnager settled~\cite{DBLP:journals/dcc/Mesnager11}.
+It is recalled here for completeness
+and because it inspired the treatment for the general case.
 
 For $\omega \neq 0$, $\tr[m_1]{m_0}{\omega u_1} = 0$ if and only if $u_1 = w_1^{-1}$, so that
 \begin{align*}
@@ -387,37 +409,28 @@ For $\omega \neq 0$, $\tr[m_1]{m_0}{\omega u_1} = 0$ if and only if $u_1 = w_1^{
 
 The only difficulty lies in the computation of $\sum_{u_1 \in U_1} \addch{f_{a,b}(u_1)}$ which can be done by splitting the sum on $U_1$ according to the value of $\mulch{u_1}$:
 \begin{align*}
-\sum_{u_1 \in U_1} \addch{f_{a,b}(u_1)} & = \sum_{u_1 \in U_1} \addch{f_{a}(u_1)} \addch{\tr{2}{b \mulch{u_1}}} \\
-& = \sum_{u_1\in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)} - \sum_{u_1\in U_1, b \mulch{u_1} \neq 1} \addch{f_{a}(u_1)} \\
-& = 2 \sum_{u_1\in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)} - \sum_{u_1\in U_1} \addch{f_{a}(u_1)} \enspace .
+\sum_{u_1 \in U_1} \addch{f_{a,b}(u_1)}
+& = \sum_{u_1 \in U_1} \addch{f_{a}(u_1)} \addch{g_b(u_1)} \\
+& = \sum_{u_1\in U_1, b \mulch[m_0]{u_1} = 1} \addch{f_{a}(u_1)}
+ - \sum_{u_1\in U_1, b \mulch[m_0]{u_1} \neq 1} \addch{f_{a}(u_1)} \\
+& = 2 \sum_{u_1\in U_1, b \mulch[m_0]{u_1} = 1} \addch{f_{a}(u_1)}
+ - \sum_{u_1\in U_1} \addch{f_{a}(u_1)} \enspace .
 \end{align*}
 
-It is well known that the second sum is
+As noted in Section~\ref{sec:kloo} the second sum is
 \begin{align*}
 \sum_{u_1 \in U_1} \addch{f_{a}(u_1)} & = 1 - K_{m_1}(a) \enspace .
 \end{align*}
 
-As far as the first one is concerned, it is enough to compute it for $b = 1$.
-Indeed, set $\beta$ to be a primitive third root of unity (which generates $\GF[4]{}^*$),
-then it takes the same value for $b = \beta$ and $b = \beta^2$,
-and the sum over these three values has just been computed.
-
-Let $D_3(x) = x^3 + x$ be the third Dickson polynomial of the first kind and $\T_{m_1}^i \subset \GF{m_1}$ denote the set of elements whose inverses have trace $i$ for $i \in \GF{}$.
-As $m_1$ is odd, $D_3$ induces a permutation of $\T_{m_1}^0$.
-For $b = 1$, one can therefore compute
+As far as the first one is concerned, as $m_1$ is odd, properties of the Dickson polynomial $D_3$
+given in Section~\ref{sec:dickson} show that for $b = 1$:
 \begin{align*}
-\sum_{u_1 \in U_1, \mulch{u_1} = 1} \addch{f_{a}(u_1)} & = \frac{1}{3} \sum_{u_1 \in U_1} \addch{f_{a}(u_1^3)} \\
-& = \frac{1}{3} \sum_{u_1 \in U_1} \addch{\tr{m_1}{a \left( u_1^3 + u_1^{-3} \right)}} \\
-& = \frac{1}{3} \sum_{u_1 \in U_1} \addch{\tr{m_1}{a D_3(u_1 + u_1^{-1})}} \\
-& = \frac{1}{3} \left( 1 + \sum_{u_1 \neq 1} \addch{\tr{m_1}{a D_3(u_1 + u_1^{-1})}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{a D_3(t)}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{a D_3(t)}} \right) \\
-& = \frac{1}{3} \left( 1 + 2 \sum_{t \in \GF{m_1}} \addch{\tr{m_1}{a D_3(t)}} - 2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{a t}} \right) \\
+\sum_{u_1 \in U_1, \mulch[m_0]{u_1} = 1} \addch{f_{a}(u_1)}
 & = \frac{1}{3} \left( 1 + 2 C_{m_1}(a, a) - K_{m_1}(a) \right) \enspace .
 \end{align*}
 For $b \neq 1$, one deduces
 \begin{align*}
-\sum_{u_1 \in U_1, b \mulch{u_1} = 1} \addch{f_{a}(u_1)}
+\sum_{u_1 \in U_1, b \mulch[m_0]{u_1} = 1} \addch{f_{a}(u_1)}
 & = \frac{1}{3} \left( 1 - C_{m_1}(a, a) - K_{m_1}(a) \right) \enspace .
 \end{align*}
 
@@ -427,8 +440,8 @@ for $\omega = 0$:
 \Wa{f_{a,b}}(0)
 = \left\{
 \begin{array}{ll}
-1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$ ;} \\
-1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) + 2 C_{m_1}(a, a) \right) & \text{if $b \neq 1$ ;}
+1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$;} \\
+1 + \frac{2^{m_1}-1}{3} \left( 1 - K_{m_1}(a) + 2 C_{m_1}(a, a) \right) & \text{if $b \neq 1$;}
 \end{array}
 \right.
 \end{align}
@@ -437,20 +450,19 @@ and for $\omega \neq 0$:
 \Wa{f_{a,b}}(\omega)
 & = \left\{
 \begin{array}{ll}
-1 + 2^{m_1} \addch{f_{a,b}(w_1^{-1})} + \frac{1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$ ;}\\
+1 + 2^{m_1} \addch{f_{a,b}(w_1^{-1})} + \frac{1}{3} \left( 1 - K_{m_1}(a) - 4 C_{m_1}(a, a) \right) & \text{if $b = 1$;}\\
 1 + 2^{m_1} \addch{f_{a,b}(w_1^{-1})} + \frac{1}{3} \left( 1 - K_{m_1}(a) + 2 C_{m_1}(a, a) \right) & \text{if $b \neq 1$.}
 \end{array}
 \right.
 \end{align}
 
-The values of $C_{m_1}(a, a)$ computed by Carlitz~\cite{MR544577}
-yield a concise and easy to compute formula for the Walsh spectrum
-of $f_{a,b}$.
-Moreover, Charpin \etal~\cite{4595463,DBLP:journals/dm/CharpinHZ09} derived from Carlitz's results
-that $C_{m_1}(a, a) = 0$ if and only if $K_{m_1}(a) \equiv 1 \pmod{3}$.
-Together with the Hasse--Weil bound, it is enough to prove that
+The values of $C_{m_1}(a, a)$ when $m_1$ is even were also computed by Carlitz~\cite{MR544577}
+and yield a concise and easy to compute formula for the Walsh spectrum of $f_{a,b}$.
+
+Together with Charpin \etal results~\cite{4595463,DBLP:journals/dm/CharpinHZ09}
+and the Hasse--Weil bound on $K_{m_1}(a)$, it is enough to prove that
 $f_{a,b}$ is (hyper-)bent if and only if $K_{m_1}(a) = 4$
-as noted by Mesnager~\cite{DBLP:journals/dcc/Mesnager11}.
+as was noted by Mesnager~\cite{DBLP:journals/dcc/Mesnager11}.
 
 \section{Even case}
 

@@ -71,7 +71,7 @@ AC_ARG_WITH([assembly],
    [with_assembly=yes])
 
 AC_ARG_WITH([sage],
-   [AC_HELP_STRING([--with-sage=DIR],[Sage install directory])],
+   [AC_HELP_STRING([--with-sage=PATH],[Sage script path])],
    [SAGE_CMD=$withval],
    [SAGE_CMD=sage])
 

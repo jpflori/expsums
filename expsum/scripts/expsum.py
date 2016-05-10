@@ -41,6 +41,18 @@ def write_header(replacements):
     infile.close()
     outfile.close()
 
+def write_asm(replacements):
+    infile = open('./src/expsum.c.in', 'r')
+    outfile = open('./src/expsum.c', 'w')
+
+    for line in infile:
+        for src, target in replacements.iteritems():
+            line = line.replace(src, target)
+        outfile.write(line)
+
+    infile.close()
+    outfile.close()
+
 import inspect
 import sage.all
 from sage.rings.integer_ring import ZZ
@@ -150,9 +162,13 @@ K0TRACES = ZZ(sum(2**i*tr.lift() for i,tr in enumerate(TR)))
 GF4TR = [sum((g1**i)**(2**(2*j)) for j in xrange(m2)) for i in xrange(m1)]
 K1GF4TRACES = [ZZ(sum(2**i for i,tr in enumerate(GF4TR) if tr == zeta3**j)) for j in xrange(3)]
 
+POWM2ASMINC = "#include \"powm2.asm\"\n"*(m2-1)+"#include \"powm2.asm\""
+POWM2P1D3ASMINC = "#include \"powm2p1d3.asm\"\n"*((m2-3)//2-1)+"#include \"powm2p1d3.asm\""
+
 allvars = vars().items()
 replacements = dict(('%'+name+'%', myprint(value)) for (name, value) in allvars
                     if myfilter(name, value, type(GF)))
 
 if __name__ == "__main__":
     write_header(replacements)
+    write_asm(replacements)

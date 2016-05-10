@@ -65,10 +65,11 @@ typedef word_t dword_t;
     } while (0)
 #endif /* USE_DWORD */
 
+#if USE_DWORD
 #if USE_GCC_INTRINSICS
 #error "Not implemented yet."
 #else /* USE_GCC_INTRINSICS */
-#define WORD_K0MOD_SPARSE(R, A) do {                            \
+#define WORD_K0MOD_SPARSE_AVX(R, A) do {                        \
         int i;                                                  \
         dword_t B;                                              \
         B = _mm_cvtsi64_si128(0);                               \
@@ -92,6 +93,11 @@ typedef word_t dword_t;
         (R) = _mm_cvtsi128_si64((A));                           \
     } while (0)
 #endif /* USE_GCC_INTRINSICS */
+#else /* USE_DWORD */
+#define WORD_K0MOD_SPARSE_AVX(R, A) do {                        \
+         R = k0mod_sparse(A);                                   \
+    } while (0)
+#endif /* USE_DWORD */
 
 /*
   Extension degrees and related values:

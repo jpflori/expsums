@@ -38,7 +38,7 @@ AC_DEFUN([GENERATE_ASSEMBLY], [
 
 AC_DEFUN([TUNE_CFLAGS], [
 gcc_cflags="-mpclmul -msse4.2 -Wall -pedantic"
-gcc_cflags_nodebug="-O0 -funroll-loops -fomit-frame-pointer"
+gcc_cflags_nodebug="-O3 -funroll-loops -fomit-frame-pointer"
 gcc_cflags_debug="-g -O0 -fno-inline-functions"
 dnl If compiler is gcc, then use some specific flags.
 dnl But don't touch user other flags.

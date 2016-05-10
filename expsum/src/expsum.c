@@ -791,15 +791,15 @@ compute_sums(sword_t *sums, word_t aw1)
         "jnz loop\n\t"
         : [SUMS0] "+m" (sums[0]), [SUMS1] "+m" (sums[1]), [SUMS2] "+m" (sums[2])
         : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
-/*          [K0MASK] "mx" (K0MASK), */
           [K0MASK] "x" (K0MASK),
+/*          [K0MASK] "xm" (K0MASK), */
           [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
           [POWM1D2] "i" (POWM1D2),
           [aw1] "mr" (aw1),
           [T1] "x" (T1[1]), [T1INV] "x" (T1INV[1]),
 /*          [T1] "xm" (T1[1]), [T1INV] "xm" (T1INV[1]),*/
           [K0ZETA3] "x" (K0ZETA3)
-/*          [K0ZETA3] "x" (K0ZETA3)*/
+/*          [K0ZETA3] "xm" (K0ZETA3)*/
         : "cc",
           "%rax", "%rbx", "%rcx", "%rdx",
           "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7"
@@ -1206,13 +1206,14 @@ thread_compute(void *id)
           [aw1] "+x" (aw1)
 
         : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
-          [K0MASK] "mx" (K0MASK), [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
+          [K0MASK] "x" (K0MASK),
+          [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
           [POWM1D2] "i" (POWM1D2),
-          [T1] "mx" (T1[1]), [T1INV] "mx" (T1INV[1]),
-          [K0ZETA3] "mx" (K0ZETA3),
+          [T1] "x" (T1[1]), [T1INV] "x" (T1INV[1]),
+          [K0ZETA3] "x" (K0ZETA3),
           [KSPOWPLUS] "mr" (data.kspowplus), [KSPOW] "mr" (data.kspow),
           [POWM2N] "mr" (POWM2N),
-          [T1NBTHR] "mx" (T1[NB_THREADS])
+          [T1NBTHR] "x" (T1[NB_THREADS])
         : "cc",
           "%ebx",
           "%r8", "%r9", "%r10", "%r11",
@@ -1619,10 +1620,11 @@ check_conjecture(void)
           [aw1] "+x" (aw1)
 
         : [M0BS] "i" (M0BS), [M0BSL] "i" (M0BSL), [M0] "i" (M[0]),
-          [K0MASK] "mx" (K0MASK), [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
+          [K0MASK] "x" (K0MASK),
+          [F0D] "i" (F0D[0]), [K0TRACES] "mr" (K0TRACES),
           [POWM1D2] "i" (POWM1D2),
-          [T1] "mx" (T1[1]), [T1INV] "mx" (T1INV[1]),
-          [K0ZETA3] "mx" (K0ZETA3),
+          [T1] "x" (T1[1]), [T1INV] "x" (T1INV[1]),
+          [K0ZETA3] "x" (K0ZETA3),
           [KSPOWPLUS] "mr" (kspowplus), [KSPOW] "mr" (kspow),
           [POWM2N] "mr" (POWM2N)
         : "cc",

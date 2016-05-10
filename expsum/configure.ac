@@ -71,16 +71,19 @@ AC_ARG_WITH([assembly],
    [with_assembly=yes])
 
 AC_ARG_WITH([sage],
-   [AC_HELP_STRING([--with-sage=PATH],[Sage script path])],
+   [AC_HELP_STRING([--with-sage=PATH],
+   [Sage command (default is sage)])],
    [SAGE_CMD=$withval],
    [SAGE_CMD=sage])
 
+dnl not used at the moment
 AC_ARG_ENABLE([pclmul],
    [AS_HELP_STRING([--enable-pclmul],
    [Turn on pclmul code (default is yes)])],
    [],
    [enable_pclmul=yes])
 
+dnl not used at the moment
 AC_ARG_ENABLE([popcnt],
    [AS_HELP_STRING([--enable-popcnt],
    [Turn on popcnt code (default is yes)])],
@@ -106,7 +109,7 @@ AC_SEARCH_LIBS([pari_init], [pari], [], [
   AC_MSG_ERROR([unable to find the PARI library])
 ])
 
-dnl Assembly
+dnl Assembly, currently done in GENERATE_HEADER
 TUNE_ASSEMBLY([])
 GENERATE_ASSEMBLY([])
 

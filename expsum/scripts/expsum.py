@@ -44,10 +44,10 @@ def write_header(replacements):
 import inspect
 import sage.all
 from sage.rings.integer_ring import ZZ
-from sage.rings.finite_rings.constructor import GF
+from sage.rings.finite_rings.finite_field_constructor import GF
 from sage.rings.polynomial.polynomial_ring import polygen
 from sage.categories.homset import Hom
-from sage.rings.arith import euler_phi
+from sage.arith.all import euler_phi
 
 MAX_THREADS=ZZ(input("max_threads = "))
 
@@ -75,6 +75,7 @@ K1HIGHBIT = 2**(m1-1)
 K0MASK = 2**m0 - 1
 K0HIGHBIT = 2**(m0-1)
 NECKLACES = 1/m1*sum(euler_phi(d)*2**(ZZ(m1/d)) for d in m1.divisors())
+# 9*2*2*2 > 64
 if m2 > 8:
     USE_DWORD = 1
 else:

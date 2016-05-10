@@ -1,3 +1,7 @@
+#if USE_GCC_INTRINSICS
+#error "USE_GCC_INTRINSICS not supported yet."
+#endif /* USE_GCC_INTRINSICS */
+
 /*
   Types and macros.
 */
@@ -14,9 +18,9 @@ typedef word_t dword_t;
 #define WORD(A) UINT64_C(A)
 
 #if USE_GCC_INTRINSICS
-#define POPCOUNT(A) __builtin_popcountl(A)
+#define WORD_POPCOUNT(A) __builtin_popcountl(A)
 #else /* USE_GCC_INTRINSICS */
-#define POPCOUNT(A) _mm_popcnt_u64(A)
+#define WORD_POPCOUNT(A) _mm_popcnt_u64(A)
 #endif /* USE_GCC_INTRINSICS */
 
 #if USE_GCC_INTRINSICS
@@ -30,6 +34,7 @@ typedef word_t dword_t;
 #endif /* USE_GCC_INTRINSICS */
 
 #if USE_GCC_INTRINSICS
+#error "Not implemented yet."
 #else /* USE_GCC_INTRINSICS */
 #if USE_DWORD
 #define DWORD_PCLMUL(R, A, B) do {                                       \
@@ -42,6 +47,7 @@ typedef word_t dword_t;
 
 #if USE_DWORD
 #if USE_GCC_INTRINSICS
+#error "Not implemented yet."
 #else /* USE_GCC_INTRINSICS */
 #define WORD_LP(R, A, MASK)  do {                       \
         R = ((word_t) _mm_cvtsi128_si64(A)) & MASK;     \
@@ -60,6 +66,7 @@ typedef word_t dword_t;
 #endif /* USE_DWORD */
 
 #if USE_GCC_INTRINSICS
+#error "Not implemented yet."
 #else /* USE_GCC_INTRINSICS */
 #define WORD_K0MOD_SPARSE(R, A) do {                            \
         int i;                                                  \
@@ -126,7 +133,7 @@ static const int F1D[] = {%F1D%};
 #if F0X
 #define K0MOD k0mod_x
 #else /* F0X */
-#define K0MOD k0mod_intrinsics
+#define K0MOD k0mod_sparse
 #endif /* F0X */
 #if F1X
 #define K1MOD k1mod_x

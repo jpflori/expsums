@@ -682,7 +682,7 @@ The first sum is easily seen to be a cubic sum:
 & = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{c}} \addch{\tr{m_1}{a x}} \\
 & = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c x}} \\
 & = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a c x^3}} \\
-& = \frac{1}{3} C_{m_1}(a c, 0) \enspace .
+& = \frac{1}{3} \left(C_{m_1}(a c, 0) - 1\right) \enspace .
 \end{align*}
 As $m_1$ is even and $m_2$ is odd, Carlitz's results~\cite{MR544577} imply
 \begin{align}
@@ -690,7 +690,7 @@ As $m_1$ is even and $m_2$ is odd, Carlitz's results~\cite{MR544577} imply
 & = \left\{
 \begin{array}{ll}
 \frac{2^{m_2+1} - 1}{3} & \text{if $\gamma = \alpha^{-1}$,} \\
--\frac{2^{m_2} + 1}{3} & \text{if $\gamma \neq \alpha^{-1}$.}
+\frac{-2^{m_2} - 1}{3} & \text{if $\gamma \neq \alpha^{-1}$.}
 \end{array}
 \right. \label{eqn:twistedcubic}
 \end{align}
@@ -702,12 +702,13 @@ First remark that summing over the three possible values of $\gamma$ yields
 \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a x + x^{-1}}}
 & = K_{m_1}(a) - 1 \enspace .
 \end{align*}
-Moreover, making the change of variable $x = \left(a x\right)^{-1}$ shows that
-the sum takes the same value at $\gamma$ and $\alpha^{-1} \gamma^{-1} = \alpha^2 \gamma^2$.
-For example, if $\alpha = 1$, that is if $a$ is a cube,
-it means it takes the same value for $\gamma \in \{ \beta, \beta^2 \}$.
-In any case, it is sufficient to determine the value of the sum for one value
-of $\gamma$ to deduce the values for all $\gamma$'s.
+Moreover, making the change of variable $x = \left(a x\right)^{-1}$
+shows that the sum takes the same value for $\gamma$ and $\alpha^{-1} \gamma^{-1}$.
+In particular, it takes the same value for $\alpha \beta$ and $\alpha \beta^2$, that is for the elements of $\GF[4]{}^*$ different from $\alpha$.
+%For example, if $\alpha = 1$, that is if $a$ is a cube,
+%it means it takes the same value for $\gamma \in \{ \beta, \beta^2 \}$.
+%In any case, it is sufficient to determine the value of the sum for one value
+%of $\gamma$ to deduce the values for all $\gamma$'s.
 
 Denote by $r$ a square root of $a$.
 The change of variable $x = rx$ and properties of the Dickson polynomial $D_3$
@@ -742,12 +743,25 @@ Then the sum $\Snu[2]$ is
 \Snu[2]
 & = \left\{
 \begin{array}{ll}
-\frac{2^{m_2+1} - 1}{3} - \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha = 1$,}\\
--\frac{2^{m_2} + 1}{3} - \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha \neq 1$,}\\
-\frac{2^{m_2+1} - 1}{3} - \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha^{-1} \neq 1$,}\\
--\frac{2^{m_2} + 1}{3} - \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma \neq \alpha$ and $\gamma \neq \alpha^{-1}$.}
+%\frac{2^{m_2+1} - 1}{3} - \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha = 1$,}\\
+%-\frac{2^{m_2} + 1}{3} - \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha \neq 1$,}\\
+%\frac{2^{m_2+1} - 1}{3} - \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha^{-1} \neq 1$,}\\
+%-\frac{2^{m_2} + 1}{3} - \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma \neq \alpha$ and $\gamma \neq \alpha^{-1}$.}
+\frac{1}{3} \left(2^{m_2 + 1} - 2 C_{m_1}(a, a) - K_{m_1}(a)\right)
+& \text{if $\gamma = \alpha$ and $\gamma = \alpha^{-1}$,}\\
+\frac{1}{3} \left(-2^{m_2} - 2 C_{m_1}(a, a) - K_{m_1}(a)\right)
+& \text{if $\gamma = \alpha$ and $\gamma \neq \alpha^{-1}$,}\\
+\frac{1}{3} \left(2^{m_2 + 1} + C_{m_1}(a, a) - K_{m_1}(a)\right)
+& \text{if $\gamma \neq \alpha$ and $\gamma = \alpha^{-1}$,}\\
+\frac{1}{3} \left(-2^{m_2} + C_{m_1}(a, a) - K_{m_1}(a)\right)
+& \text{if $\gamma \neq \alpha$ and $\gamma \neq \alpha^{-1}$.}
 \end{array}
-\right.
+\right. \\
+& = \frac{1}{3} \left(
+\left(2 - 3 \tr{2}{\alpha \gamma}\right) 2^{m_2}
+- \left(2 - 3 \tr{2}{\alpha^{-1} \gamma}\right) C_{m_1}(a, a)
+- K_{m_1}(a)
+\right) \enspace .
 \end{align}
 \end{proposition}
 
@@ -771,12 +785,13 @@ Then the sum $\Snu[2]$ is
 %- \frac{2^{m_2} + K_{m_1}(a)}{3} & \text{if $\gamma \neq 1$,}
 %\end{array}
 %\right. \nonumber \\
-& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{\gamma}} \right) 2^{m_2-1} \enspace .
+%& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{\gamma}} \right) 2^{m_2-1} \enspace .
+& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \tr{2}{\gamma} 2^{m_2} \enspace .
 \end{align}
 and the Walsh transform at $\omega \neq 0$ is
 \begin{align}
 \Wa{f_{a,b}}(\omega)
-& = 2^{m_1} \addch{\tr{2}{\gamma}} + \frac{4 - K_{m_1}(a)}{3} \enspace .
+& = \addch{\tr{2}{\gamma}} 2^{m_1} + \frac{4 - K_{m_1}(a)}{3} \enspace .
 \end{align}
 
 \end{corollary}
@@ -818,8 +833,9 @@ the sum $\Snu[2]$ is
 \begin{align*}
 \Snu[2]
 & = \frac{2^{m_2+1} - K_{m_1}(a)}{3} \nonumber \\
-& \qquad - \left( 1 - \addch{\mystery} \right) 2^{m_2-1} \nonumber \\
-& \qquad - \left( 1 - \addch{\tr{m_0}{a w_1^2}} \right) \frac{2^{m_2-1} - 1}{3} \enspace .
+& \qquad + 2 \tr{m_0}{a w_1^2} \frac{2^{m_2+1} - 1}{3}  \nonumber \\
+& \qquad - \mystery \addch{\tr{m_0}{a w_1^2}} 2^{m_2}
+\enspace .
 \end{align*}
 The Walsh transform at $\omega \neq 0$ is then
 \begin{align}
@@ -845,7 +861,7 @@ The computational cost of verifying Conjecture~\ref{cnj:walshconj}
 can be somewhat leveraged using elementary properties of $\Snu[2]$:
 \begin{itemize}
 \item it only depends on the cyclotomic class of $a \in \GF{m_1}^*$,
-\item it is the same for $w_1$ and $w_1^-1$,
+\item it is the same for $w_1$ and $w_1^{-1}$,
 \item the inner value can be computed at the same time for $u_1$ and $u_1^{-1}$.
 \end{itemize}
 Whatsoever, there are

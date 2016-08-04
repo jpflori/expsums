@@ -512,7 +512,7 @@ In particular, the computation of $\sum_{u \in U} f_{a,b}(u)$ becomes straightfo
 \subsection{A necessary condition}
 
 
-The value of the Walsh transform at $\omega = 0$ given by Equation~\ref{eqn:walshzero}
+The value of the Walsh transform at $\omega = 0$ given by Equation~(\ref{eqn:walshzero})
 can therefore be simplified.
 \begin{lemma}
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
@@ -533,7 +533,7 @@ For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$, if the function $f_{a,
 
 \subsection{Descending to an odd extension}
 
-The value of the Walsh transform at $\omega \neq 0$ given by Equation~\ref{eqn:walshunit} becomes
+The value of the Walsh transform at $\omega \neq 0$ given by Equation~(\ref{eqn:walshunit}) becomes
 \begin{align}
 \Wa{f_{a,b}}(\omega)
 & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3 \left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right)
@@ -542,7 +542,7 @@ The value of the Walsh transform at $\omega \neq 0$ given by Equation~\ref{eqn:w
 The sum over $u \in U$ can be split into smaller sums according to the extension $\GF{m_i}$
 (with $1 \leq i \leq \nu$) where $\tr[m_i]{m_0}{u \omega}$ becomes $0$.
 
-The first sum (corresponding to $i=1$) has to be dealt with separately and can be simplified as Equation~\ref{eqn:sumfab}:
+The first sum (corresponding to $i=1$) has to be dealt with separately and can be simplified as Equation~(\ref{eqn:sumfab}):
 \begin{align}
 \sum_{u_1 = w_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
 %& = - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(w_1^{-1})} \\
@@ -586,7 +586,7 @@ where the second term is easily shown to be
 & = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace . \label{eqn:sumeasy}
 \end{align}
 
-Equations~\ref{eqn:sumfirst}, \ref{eqn:summiddle}, \ref{eqn:sumlast} and \ref{eqn:sumeasy} lead to the following expression for the Walsh transform at $\omega \neq 0$:
+Equations~(\ref{eqn:sumfirst}), (\ref{eqn:summiddle}), (\ref{eqn:sumlast}) and (\ref{eqn:sumeasy}) lead to the following expression for the Walsh transform at $\omega \neq 0$:
 \begin{align*}
 \Wa{f_{a,b}}(\omega)
 & = 1 + \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \nonumber \\
@@ -618,7 +618,7 @@ The Walsh transform of $f_{a,b}$ at $\omega \neq 0$ is
 
 Unfortunately, making the remaining sum $S_\nu(a, b, \omega)$ explicit
 is a hard problem.
-Doing so is equivalent to evaluating a Gauss sum as in Equation~\ref{eqn:gengauss}:
+Doing so is equivalent to evaluating a Gauss sum as in Equation~(\ref{eqn:gengauss}):
 an exponential sum involving a multiplicative character and an additive character.
 In the next section, we manage to tackle the case $\nu = 2$
 when $\omega \in \GF{m_1}^*$ (that is $w_1 = 1$)
@@ -630,7 +630,7 @@ From now on, it is supposed that $\nu = 2$, \ie $m_0$ is four times the odd numb
 
 For $\tr[m_2]{m_0}{u \omega}$ to be zero with $u_1 \neq w_1^{-1}$,
 $u_2$ must be $u_2 = \left( \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \right)^{-1}$
-so that the sum of Equation~\ref{eqn:gauss} becomes
+so that the sum of Equation~(\ref{eqn:gauss}) becomes
 \begin{align}
 \label{eqn:fourgauss}
 \Snu[2]
@@ -651,7 +651,7 @@ Define $\gamma \in \GF[4]{}^*$ by $\gamma = b \mulch[m_1]{w_2}$
 and $\alpha \in \GF[4]{}^*$ by $\alpha = \mulch[m_1]{a}$.
 Moreover, let $c \in \GF[2]{m_1}^*$ be such that $\mulch{c} = \gamma$.
 and $\beta \in \GF[4]{}^*$ be a primitive third root of unity.
-The sum of Equation~\ref{eqn:fourgauss} becomes
+The sum of Equation~(\ref{eqn:fourgauss}) becomes
 \begin{align}
 \label{eqn:fourgaussone}
 \Snu[2]
@@ -660,7 +660,7 @@ The sum of Equation~\ref{eqn:fourgauss} becomes
 & = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a t}} \nonumber \\
 & = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = \gamma} \addch{\tr{m_1}{a t}} \enspace .
 \end{align}
-The final sum in Equation~\ref{eqn:fourgaussone} can be seen as a first step
+The final sum in Equation~(\ref{eqn:fourgaussone}) can be seen as a first step
 toward generalizing the sum computed in Section~\ref{sec:odd} in the odd case:
 rather than involving $u_1$ directly, it involves its trace $t = \tr[m_1]{m_0}{u_1}$.
 
@@ -732,8 +732,8 @@ For $\gamma \neq \alpha$, one deduces:
 & = \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) \enspace . \label{eqn:twistedklooneq}
 \end{align}
 
-Gathering Equations~\ref{eqn:twistedcubic}, \ref{eqn:twistedklooeq} and
-\ref{eqn:twistedklooneq} gives the following expressions for $\Snu[2]$.
+Gathering Equations~(\ref{eqn:twistedcubic}), (\ref{eqn:twistedklooeq}) and
+(\ref{eqn:twistedklooneq}) gives the following expressions for $\Snu[2]$.
 \begin{proposition}
 For $\nu = 2$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 and $\omega \in \GF{m_1}^*$,
@@ -770,7 +770,7 @@ can be used to make the cubic sum $C_{m_1}(a, a)$ explicit.
 In the particular case where $K_{m_1}(a) \equiv 1 \pmod{3}$,
 which is equivalent to $C_{m_1}(a, a) = 0$ and implies that $a$ is a cube,
 the expression for $\Snu[2]$ gets very concise,
-as does Equation~\ref{eqn:walshfull} for the Walsh transform.
+as does Equation~(\ref{eqn:walshfull}) for the Walsh transform.
 \begin{corollary}
 \label{crl:walshsubfield}
 For $\nu = 2$, $a \in \GF{m_1}^*$ with $K_{m_1}(a) \equiv 1 \pmod{3}$
@@ -910,7 +910,7 @@ and in this note.
 Otherwise, more involved techniques could be tried, \eg considering a whole
 family of sums as a whole and their geometric structure.
 Another posibility would be to directly treat the general Gauss sums of
-Equations~\ref{eqn:gengauss} and~\ref{eqn:gauss} without focussing
+Equations~(\ref{eqn:gengauss}) and~(\ref{eqn:gauss}) without focussing
 on the case $\nu = 2$.
 
 \bibliographystyle{plain}

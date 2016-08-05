@@ -543,7 +543,7 @@ and $K_{m_1}(a) = 4$.
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$, if the function $f_{a,b}$ is bent, then $K_{m_1}(a) = 4$.
 \end{proposition}
 
-\subsection{Descending to an odd extension}
+\subsection{Descending to an odd degree extension}
 
 The value of the Walsh transform at $\omega \neq 0$ given by Equation~(\ref{eqn:walshunit}) becomes
 \begin{align}
@@ -557,32 +557,41 @@ The sum over $u \in U$ can be split into smaller sums according to the extension
 The first sum (corresponding to $i=1$) has to be dealt with separately and can be simplified as Equation~(\ref{eqn:sumfab}):
 \begin{align}
 \sum_{u_1 = w_1^{-1}, u_2 \in U_2, \ldots, u_\nu \in U_\nu} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
-%& = - \left( 2^{m_2} + 1 \right) \cdots \left( 2^{m_{\nu-1}} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(w_1^{-1})} \\
-& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(w_1^{-1})} \enspace . \label{eqn:sumfirst}
+& = - \prod_{j=2}^{\nu - 1} \left( 2^{m_j} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(w_1^{-1})}
+\nonumber \\
+& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(w_1^{-1})}
+\enspace . \label{eqn:sumfirst}
 \end{align}
 
 For $\nu > 2$, the second one (corresponding to $i = 2$) is
 \begin{align*}
 \sum_{\substack{u_1 \neq w_1^{-1},\\ \tr[m_2]{m_0}{u_1 u_2 w_1 w_2} = 0,\\ u_3 \in U_3, \ldots, u_\nu \in U_\nu}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
-%& = \prod_{j=3}^{\nu-1} \left( 2^{m_j}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)} \\
-%& = - 1 \frac{2^{2^{\nu-2} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
-%& = - \frac{2^{2^{\nu-2} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
-& = - \frac{1}{3} \prod_{j=3}^{\nu} \left( 2^{m_j}+1 \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
+& = \prod_{j=3}^{\nu-1} \left( 2^{m_j}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)}
+\\
+& = - \prod_{j=3}^{\nu-1} \left( 2^{m_j}+1 \right) \frac{2^{m_\nu}+1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\\
+& = - \frac{2^{2^{\nu-2} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\enspace ,
 \end{align*}
 together with similar sums:
 \begin{align*}
 \sum_{\substack{\tr[m_{i-1}]{m_0}{u_1 \cdots u_{i-1} w_1 \cdots w_{i-1}} \neq 0, \\ \tr[m_i]{m_0}{u_1 \cdots u_i w_1 \cdots w_i} = 0, \\u_{i+1} \in U_{i+1}, u_\nu \in U_\nu}} \hspace{-4em} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
-%& = - \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu-1} \left( 2^{m_j}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)} \\
-%& = - 2^{\left( 2^{i-2}-1 \right) 2^{\nu+1-i} m_\nu} \frac{2^{2^{\nu-i} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
-& = - \frac{1}{3} \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu} \left( 2^{m_j}+1 \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ,
+& = \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu-1} \left( 2^{m_j}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)}
+\\
+& = - \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu-1} \left( 2^{m_j}+1 \right) \frac{2^{m_\nu}+1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\\
+& = - 2^{\left( 2^{i-2}-1 \right) 2^{\nu+1-i} m_\nu} \frac{2^{2^{\nu-i} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\enspace ,
 \end{align*}
 until the penultimate one (corresponding to $i = \nu - 1$):
 \begin{align*}
 \sum_{\substack{\tr[m_{\nu-2}]{m_0}{u_1 \cdots u_{\nu-2} w_1 \cdots w_{\nu-2}} \neq 0, \\ \tr[m_\nu-1]{m_0}{u_1 \cdots u_{\nu-1} w_1 \cdots w_{\nu-1}} = 0, \\ u_\nu \in U_\nu}} \hspace{-4em} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
-%& = - \prod_{j=2}^{\nu-2} 2^{m_j} \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)} \\
-%& = - 2^{\left(2^{\nu-3}-1\right) 2^{2} m_\nu} \frac{2^{2 m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ;
-%& = - 2^{\left(2^{\nu-3}-1\right) 4 m_\nu} \frac{2^{m_\nu} - 1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ;
-& = - \frac{1}{3} \prod_{j=2}^{\nu-2} 2^{m_j} \left( 2^{m_\nu}+1 \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace ;
+& = \prod_{j=2}^{\nu-2} 2^{m_j} \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)}
+\\
+& = - \prod_{j=2}^{\nu-2} 2^{m_j} \frac{2^{m_\nu}+1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\\
+& = - 2^{\left(2^{\nu-3}-1\right) 2^{2} m_\nu} \frac{2^{2 m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) 
+\enspace ;
 \end{align*}
 and they sum back up to
 \begin{align}
@@ -601,8 +610,10 @@ $\mulch[m_0]{u_\nu}$ as in Section~\ref{sec:odd}:
 where the second term is easily shown to be
 \begin{align}
 - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0 }} \addch{f_a(u_1)}
-%& = - 2^{m_2} \cdots 2^{m_{\nu - 1}} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \\
-& = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \enspace . \label{eqn:sumeasy}
+& = - \prod_{j=2}^{\nu-1} 2^{m_j} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\nonumber \\
+& = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+\enspace . \label{eqn:sumeasy}
 \end{align}
 
 Equations~(\ref{eqn:sumfirst}), (\ref{eqn:summiddle}), (\ref{eqn:sumlast}) and (\ref{eqn:sumeasy}) lead to the following expression for the Walsh transform at $\omega \neq 0$:

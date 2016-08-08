@@ -56,7 +56,7 @@
 \makeatother
 \newcommand{\Wa}[1]{\widehat{\chi_{#1}}}
 \newcommand{\Snu}[1][\nu]{S_{#1}(a, b, \omega)}
-\newcommand{\mystery}{h_{a, b}(\omega))}
+\newcommand{\mystery}{h_{a, b}(\omega)}
 
 \allowdisplaybreaks
 
@@ -167,7 +167,7 @@ In this note, the polar decomposition of fields of even extension degree
 $n = 2^\nu m$ with $m$ odd is used to reduce the evaluation of the Walsh transform
 of $f_{a,b}$ at $\omega \in \GF{n}^*$ to that of a Gauss sum of the form
 \begin{align}
-\label{eqn:gengauss}
+\label{eq:gengauss}
 \sum_{u \in U} \mulch[n]{b \tr[m]{n}{\omega u}} \addch{\tr{n}{a u^{2^{2^{\nu-1}m}-1}}} \enspace ,
 \end{align}
 where $\GF{n}^*$ is decomposed as $\GF{n}^* \simeq U \times \GF{m}^*$,
@@ -456,13 +456,13 @@ For $\nu \geq 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 the Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}$ is,
 for $\omega = 0$:
 \begin{align}
-\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_\nu} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace , \label{eqn:walshzero}
+\Wa{f_{a,b}}(0) & = 1 + \left( 2^{m_\nu} - 1 \right) \sum_{u \in U} \addch{f_{a,b}(u)} \enspace , \label{eq:walshzero}
 \end{align}
 and for $\omega \neq 0$:
 \begin{align}
 \Wa{f_{a,b}}(\omega)
 %& = 1 - \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} \neq 0} \addch{f_{a,b}(u)} + (2^{m_\nu} - 1) \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \nonumber \\
-& = 1 - \sum_{u \in U} \addch{f_{a,b}(u)} + 2^{m_\nu} \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \enspace . \label{eqn:walshunit}
+& = 1 - \sum_{u \in U} \addch{f_{a,b}(u)} + 2^{m_\nu} \sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} \enspace . \label{eq:walshunit}
 \end{align}
 \end{lemma}
 
@@ -482,7 +482,7 @@ The sum ranging over $\GF{m_\nu}^*$ is equal to $-1$ when $\tr[m_\nu]{m_0}{\omeg
 In particular, when $\omega = 0$,  the trace is $0$ for all $u \in U$.
 \end{proof}
 
-To go further, the cases $\nu = 1$ and $\nu \geq 2$ have to be dealt with separately.
+To go further, the cases $\nu = 1$ and $\nu > 1$ have to be dealt with separately.
 
 \section{Odd case}
 \label{sec:odd}
@@ -572,16 +572,16 @@ For $\nu = 1$, $a \in \GF{m}^*$ and $b \in \GF[4]{}^*$, the function $f_{a,b}$ i
 
 \subsection{General extension degree}
 
-In this section, it is supposed that $\nu \geq 2$, \ie both $m_0$ and $m_1$ are even.
+In this section, it is supposed that $\nu > 1$, \ie both $m_0$ and $m_1$ are even.
 The main difference with the case $\nu = 1$ is that $3$ does now divide $2^{m_1}-1$ (in fact $2^{m_\nu}+1$) rather than $2^{m_1}+1$,
  and $\mulch[m_0]{u}$ does not depend on the value of $u_1$ (but only on that of $u_\nu$).
 
 In particular, the computation of $\sum_{u \in U} f_{a,b}(u)$ becomes straightforward.
 \begin{lemma}
-For $\nu \geq 2$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
+For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 \begin{align}
 \sum_{u \in U} \addch{f_{a,b}(u)}
-& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3 \left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \enspace . \label{eqn:sumfab}
+& = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3 \left(2^{m_\nu} - 1\right)} \left( 1 - K_{m_1}(a) \right) \enspace . \label{eq:sumfab}
 \end{align}
 \end{lemma}
 
@@ -602,11 +602,12 @@ Finally, using the identity $\left( 2^{2^j m_\nu} + 1 \right) \left( 2^{2^j m_\n
 & = \prod_{j=2}^{\nu} \left( 2^{2^{\nu-j} m_\nu}+1 \right)
 = \frac{2^{2^{\nu-1} m_\nu} - 1}{2^{m_\nu} - 1}
 \enspace .
+\qedhere
 \end{align*}
 \end{proof}
 
 The value of the Walsh transform at $\omega = 0$ given
-by Equation~(\ref{eqn:walshzero}) can now be simplified.
+by Equation~(\ref{eq:walshzero}) can now be simplified.
 \begin{lemma}
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 the Walsh transform of $f_{a,b}$ at $\omega = 0$ is
@@ -624,7 +625,7 @@ and $K_{m_1}(a) = 4$.
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$, if the function $f_{a,b}$ is bent, then $K_{m_1}(a) = 4$.
 \end{proposition}
 
-Finally, the value of the Walsh transform at $\omega \neq 0$ given by Equation~(\ref{eqn:walshunit}) is simplified as follows.
+Finally, the value of the Walsh transform at $\omega \neq 0$ given by Equation~(\ref{eq:walshunit}) is simplified as follows.
 \begin{lemma}
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 the Walsh transform of $f_{a,b}$ at $\omega \in \GF{m_0}^*$ is
@@ -649,8 +650,8 @@ giving the following expression.
 For $\nu > 1$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 and $\omega \in \GF{m_0}^*$, denote by $\Snu$ the sum
 \begin{align}
-%\sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch[m_0]{u_\nu} = 1}} \addch{f_a(u_1)} \label{eqn:gauss}
-S_\nu(a, b, \omega) & = \sum_{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \tr[m_\nu]{m_0}{u \omega} = 0, b \mulch[m_0]{u_\nu} = 1} \addch{f_a(u_1)} \label{eqn:gauss} \enspace.
+%\sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0,\\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch[m_0]{u_\nu} = 1}} \addch{f_a(u_1)} \label{eq:gauss}
+S_\nu(a, b, \omega) & = \sum_{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \tr[m_\nu]{m_0}{u \omega} = 0, b \mulch[m_0]{u_\nu} = 1} \addch{f_a(u_1)} \label{eq:gauss} \enspace.
 \end{align}
 The Walsh transform of $f_{a,b}$ at $\omega \neq 0$ is
 \begin{align}
@@ -659,7 +660,7 @@ The Walsh transform of $f_{a,b}$ at $\omega \neq 0$ is
 %& \qquad - \left( \frac{2^{\left( 2^{\nu-1} - 1 \right) m_{\nu}}-2^{m_\nu}}{3 \left( 2^{m_{\nu}}-1 \right)} + 2^{\left(2^{\nu - 1} - 1\right) m_\nu} \right) \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right) \nonumber \\
 & = 1 - \frac{2 \cdot 2^{\left(2^{\nu-1}-1\right)m_\nu} - 1}{3} \left(1 - K_{m_1}(a)\right) \nonumber \\
 & \qquad - \frac{2 \cdot 2^{\left( 2^{\nu-1} - 1 \right) m_\nu} \left( 2^{m_\nu - 1} - 1 \right)}{3} \addch{f_a(w_1)} \nonumber \\
-& \qquad + 2^{m_{\nu} + 1} \Snu \enspace . \label{eqn:walshfull}
+& \qquad + 2^{m_{\nu} + 1} \Snu \enspace . \label{eq:walshfull}
 \end{align}
 \end{proposition}
 
@@ -676,7 +677,7 @@ $\sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} = \sum_{i = 1}
 
 The first sum $\sigma_1$
 %has to be dealt with indenpendently and
-can be simplified as Equation~(\ref{eqn:sumfab}):
+can be simplified as Equation~(\ref{eq:sumfab}):
 \begin{align}
 \sigma_1
 & = \prod_{j=2}^{\nu - 1} \left( 2^{m_j} + 1 \right) \addch{f_a(w_1^{-1})} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)}
@@ -684,7 +685,7 @@ can be simplified as Equation~(\ref{eqn:sumfab}):
 & = - \prod_{j=2}^{\nu - 1} \left( 2^{m_j} + 1 \right) \frac{2^{m_\nu} + 1}{3} \addch{f_a(w_1^{-1})}
 \nonumber \\
 & = - \frac{2^{2^{\nu-1} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \addch{f_a(w_1^{-1})}
-\enspace . \label{eqn:sumfirst}
+\enspace . \label{eq:sumfirst}
 \end{align}
 
 The last sum $\sigma_\nu$ can be split according to the value of
@@ -693,17 +694,20 @@ $\mulch[m_0]{u_\nu}$ as in Section~\ref{sec:odd}:
 %\sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \addch{g_b(u_\nu)}
 \sigma_\nu
 & = 2 \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0,\\ b \mulch[m_0]{u_\nu} = 1}} \addch{f_a(u_1)}
- - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \enspace , \label{eqn:sumlast}
+ - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0}} \addch{f_a(u_1)} \enspace , \label{eq:sumlast}
 \end{align}
 where the first term is $2 S_\nu(a, b, \omega)$
 and the second term is
 \begin{align}
 - \sum_{\substack{\tr[m_{\nu-1}]{m_0}{u \omega} \neq 0, \\ \tr[m_\nu]{m_0}{u \omega} = 0 }} \addch{f_a(u_1)}
+& =
+- \prod_{j=2}^{\nu-1} 2^{m_j} \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)}
+\nonumber \\
 & = - \prod_{j=2}^{\nu-1} 2^{m_j} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
 \nonumber \\
 & = - 2^{2 \left(2^{\nu - 2} - 1\right) m_\nu} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
 \enspace ,
-\label{eqn:sumeasy}
+\label{eq:sumeasy}
 \end{align}
 as the product of the $2^{m_j}$'s is
 \begin{align}
@@ -716,17 +720,15 @@ as the product of the $2^{m_j}$'s is
 \end{align}
 
 For $\nu > 2$, the intermediate sums $\sigma_i$ for $2 < i < \nu$ are:
-\begin{align}
+\begin{align*}
 \sigma_i
 & = \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu-1} \left( 2^{m_j}+1 \right) \sum_{u_1 \neq w_1^{-1}} \addch{f_a(u_1)} \sum_{u_\nu \in U_\nu} \addch{g_b(u_\nu)}
-\nonumber
 \\
 & = - \prod_{j=2}^{i-1} 2^{m_j} \prod_{j=i+1}^{\nu-1} \left( 2^{m_j}+1 \right) \frac{2^{m_\nu}+1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
-\nonumber
-\\
-& = - 2^{\left( 2^{i-2}-1 \right) 2^{\nu+1-i} m_\nu} \frac{2^{2^{\nu-i} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
+%\\
+%& = - 2^{\left( 2^{i-2}-1 \right) 2^{\nu+1-i} m_\nu} \frac{2^{2^{\nu-i} m_\nu} - 1}{3\left(2^{m_\nu} - 1\right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
 \enspace .
-\end{align}
+\end{align*}
 
 Fortunately, a simpler expression for the sum of
 of the products of $2^{m_j}$'s and $(2^{m_j}+1)$'s
@@ -749,8 +751,8 @@ the sum that we denote by $\Sigma(m, k)$ is
 The proof goes by induction on $k$.
 For $k = 3$, the identity states
 $2^{m}+1 = \frac{2^{2 m}-1}{2^{m}-1}$.
-Let us now suppose that for Equation (\ref{eq:sumprodpows}) is
-verified for all rational numbers $m$'s up to some $k \geq 3$.
+Let us now suppose that Equation (\ref{eq:sumprodpows}) is
+verified up to some $k \geq 3$ for all rational numbers $m$'s.
 The sum for $k+1$ is
 \begin{align*}
 \Sigma(m, k + 1)
@@ -789,21 +791,21 @@ the identity is proved for $k+1$:
 \enspace .
 \end{align*}
 
-Setting $k = \nu$ and $m = m_\nu$ into Equation (\ref{eq:sumprodpows}) yields
+Setting $k = \nu$ and $m = m_\nu$ in Equation (\ref{eq:sumprodpows}) yields
 \begin{align}
 \sum_{i=2}^{\nu-1} \sigma_i
 & =
 %- \frac{2^{\left( 2^{\nu-2} - 1 \right) m_{\nu-1}}-1}{2^{m_{\nu-1}}-1} \frac{2^{m_\nu} + 1}{3} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
 - \frac{2^{2 \left( 2^{\nu-2} - 1 \right) m_{\nu}}-1}{3 \left( 2^{m_{\nu}}-1 \right)} \left( 1 - \addch{f_a(w_1^{-1})} - K_{m_1}(a) \right)
 \enspace .
-\label{eqn:summiddle}
+\label{eq:summiddle}
 \end{align}
 
 Note that for $\nu = 2$, both sides of the above equality
 are zero.
-Therefore, for any $\nu \geq 2$,
-Equations~(\ref{eqn:sumfirst}), (\ref{eqn:sumlast}), (\ref{eqn:sumeasy})
-and  (\ref{eqn:summiddle}),
+Therefore, for any $\nu > 1$,
+Equations~(\ref{eq:sumfirst}), (\ref{eq:sumlast}), (\ref{eq:sumeasy})
+and  (\ref{eq:summiddle}),
 lead to the following expression for the Walsh transform at $\omega \neq 0$:
 \begin{align*}
 \Wa{f_{a,b}}(\omega)
@@ -816,12 +818,13 @@ lead to the following expression for the Walsh transform at $\omega \neq 0$:
 & \qquad + 2^{m_\nu + 1} S_\nu(a, b, \omega)
 \enspace ,
 \end{align*}
-which can be still made a little more concise as in the proposition.
+which gives the announced expression by gathering indenpendently
+the terms in $\addch{f_a(w_1^{-1})}$ and $(1 - K_{m_1}(a))$.
 \end{proof}
 
 Unfortunately, making the remaining sum $S_\nu(a, b, \omega)$ explicit
 is a hard problem.
-Doing so is equivalent to evaluating a Gauss sum as in Equation~(\ref{eqn:gengauss}):
+Doing so is equivalent to evaluating a Gauss sum as in Equation~(\ref{eq:gengauss}):
 an exponential sum involving a multiplicative character and an additive character.
 In the next section, we manage to tackle the case $\nu = 2$
 when $\omega \in \GF{m_1}^*$ (that is $w_1 = 1$)
@@ -832,10 +835,11 @@ and conjecture a partial formula when $\omega \not\in \GF{m_1}^*$.
 From now on, it is supposed that $\nu = 2$, \ie $m_0$ is four times the odd number $m_2$.
 
 For $\tr[m_2]{m_0}{u \omega}$ to be zero with $u_1 \neq w_1^{-1}$,
-$u_2$ must be $u_2 = \left( \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \right)^{-1}$
-so that the sum of Equation~(\ref{eqn:gauss}) becomes
+$u_2$ must be the polar part of
+$\left( \omega_2 \tr[m_1]{m_0}{u_1 \omega_1} \right)^{-1}$
+so that the sum of Equation~(\ref{eq:gauss}) becomes
 \begin{align}
-\label{eqn:fourgauss}
+\label{eq:fourgauss}
 \Snu[2]
 & = \sum_{u_1 \neq w_1^{-1}, \mulch[m_0]{w_2 \tr[m_1]{m_0}{u_1 w_1}} = b} \addch{\tr{m_0}{a u_1^{-2}}} \enspace .
 \end{align}
@@ -847,47 +851,63 @@ so that the sum of Equation~(\ref{eqn:gauss}) becomes
 %\end{align*}
 
 \subsubsection{The subfield case}
-We now restrict to the case $w_1 = 1$, that is $\omega \in \GF{m_1}^*$ rather than $\omega \in \GF{m_0}^*$ in full generality.
+We now restrict to the case $w_1 = 1$, that is $\omega \in \GF{m_1}^*$ rather than $\omega \in \GF{m_0}^*$.
 
-Define $\gamma \in \GF[4]{}^*$ by $\gamma = b \mulch[m_1]{w_2}$
-%$\gamma = b w_2^{4 \frac{2^{m_2}+1}{3}}$,
-and $\alpha \in \GF[4]{}^*$ by $\alpha = \mulch[m_1]{a}$.
-Moreover, let $c \in \GF[2]{m_1}^*$ be such that $\mulch{c} = \gamma$.
-and $\beta \in \GF[4]{}^*$ be a primitive third root of unity.
-The sum of Equation~(\ref{eqn:fourgauss}) becomes
+\begin{lemma}
+For $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
+and $\omega \in \GF{m_1}^*$,
+define $\gamma \in \GF[4]{}^*$ by $\gamma = b \mulch[m_1]{w_2}$.
+%$\gamma = b w_2^{4 \frac{2^{m_2}+1}{3}}$
+Then
 \begin{align}
-\label{eqn:fourgaussone}
 \Snu[2]
-& =\sum_{u_1 \neq 1, \mulch[m_1]{u_1^2 + u_1^{-2}} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a \left( u_1^{-2}+ u_1^{2} \right)}} \nonumber \\
-& = \sum_{u_1 \neq 1, \mulch[m_1]{u_1 + u_1^{-1}} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a \left( u_1 + u_1^{-1} \right)}} \nonumber \\
-& = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a t}} \nonumber \\
-& = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = \gamma} \addch{\tr{m_1}{a t}} \enspace .
+& = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = \gamma} \addch{\tr{m_1}{a t}}
+\enspace .
+\label{eq:fourgaussone}
 \end{align}
-The final sum in Equation~(\ref{eqn:fourgaussone}) can be seen as a first step
-toward generalizing the sum computed in Section~\ref{sec:odd} in the odd case:
-rather than involving $u_1$ directly, it involves its trace $t = \tr[m_1]{m_0}{u_1}$.
+\end{lemma}
 
-%First notice that:
-%\begin{align*}
-%2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{a t}} = - K_{m_1}(a) \\
-%\end{align*}
-
-The computation can then be reduced to that of sums over all of $\GF{m_1}^*$:
+\begin{proof}
+As $w_1 = 1$, both the multiplicative and additive characters act
+on the the same inputs so that,
+after making the change of variable $u_1 = u_1 w_1$,
+we can use the function $u_1 \mapsto u_1 + u_1^{-1}$
+to transform the sum over $U_1$ of Equation~(\ref{eq:fourgauss})
+into a sum over $\T_{m_1}^1$:
 \begin{align*}
-2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = \gamma} \addch{\tr{m_1}{a t}}
-& = \sum_{x \in \GF{m_1}^*, \mulch[m_1]{x} = \gamma} \addch{\tr{m_1}{a x}} \\
-& \qquad - \sum_{x \in \GF{m_1}^*, \mulch[m_1]{x} = \gamma} \addch{\tr{m_1}{a x + x^{-1}}} \enspace .
+\Snu[2]
+& =\sum_{u_1 \neq 1, \mulch[m_1]{u_1^2 + u_1^{-2}} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a \left( u_1^{-2}+ u_1^{2} \right)}}
+\\
+& = \sum_{u_1 \neq 1, \mulch[m_1]{u_1 + u_1^{-1}} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a \left( u_1 + u_1^{-1} \right)}}
+\\
+& = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a t}}
+\enspace .
+\qedhere
 \end{align*}
+\end{proof}
 
-The first sum is easily seen to be a cubic sum:
-\begin{align*}
-\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}}
-& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{c}} \addch{\tr{m_1}{a x}} \\
-& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c x}} \\
-& = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a c x^3}} \\
-& = \frac{1}{3} \left(C_{m_1}(a c, 0) - 1\right) \enspace .
-\end{align*}
-As $m_1$ is even and $m_2$ is odd, Carlitz's results~\cite{MR544577} imply
+Remark that the sum in Equation~(\ref{eq:fourgaussone}) can be seen
+as a first step toward generalizing the sum computed in Section~\ref{sec:odd}
+in the odd case:
+rather than involving $u_1$ directly, it involves
+its trace $t = \tr[m_1]{m_0}{u_1}$.
+
+As is customary, the sum over $\T_{m_1}^1$ can be evaluated using sums
+over all of $\GF{m_1}$:
+\begin{align}
+\Snu[2]
+%2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = \gamma} \addch{\tr{m_1}{a t}}
+& = \sum_{x \in \GF{m_1}^*, \mulch[m_1]{x} = \gamma} \addch{\tr{m_1}{a x}}
+- \sum_{x \in \GF{m_1}^*, \mulch[m_1]{x} = \gamma} \addch{\tr{m_1}{a x + x^{-1}}}
+\enspace .
+\end{align}
+The first sum is easily seen to be a cubic sum
+whereas the computation of the second sum is more involved.
+
+\begin{proposition}
+For $\nu = 2$, $a \in \GF{m_1}^*$ and $\gamma \in \GF[4]{}^*$.
+Define $\alpha \in \GF[4]{}^*$ by $\alpha = \mulch[m_1]{a}$.
+The following equality holds:
 \begin{align}
 \sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}}
 & = \left\{
@@ -895,19 +915,55 @@ As $m_1$ is even and $m_2$ is odd, Carlitz's results~\cite{MR544577} imply
 \frac{2^{m_2+1} - 1}{3} & \text{if $\gamma = \alpha^{-1}$,} \\
 \frac{-2^{m_2} - 1}{3} & \text{if $\gamma \neq \alpha^{-1}$.}
 \end{array}
-\right. \label{eqn:twistedcubic}
+\right. \label{eq:twistedcubic}
 \end{align}
+\end{proposition}
+
+\begin{proof}
+Let $c \in \GF[2]{m_1}^*$ be such that $\mulch{c} = \gamma$.
+We make the change of variables $x = cx$ to transform
+the sum into a cubic sum:
+\begin{align*}
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x}}
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = \mulch{c}} \addch{\tr{m_1}{a x}} \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{a c x}} \\
+& = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a c x^3}} \\
+& = \frac{1}{3} \left(C_{m_1}(a c, 0) - 1\right) \enspace .
+\end{align*}
+Carlitz's results~\cite{MR544577} give explicit values for this cubic sum
+when $m_1$ is even and $m_2$ is odd.
+\end{proof}
 %In particular, its value only depends on $\alpha \gamma$.
 
-Let us now proceed with the second sum.
+
+\begin{proposition}
+For $\nu = 2$, $a \in \GF{m_1}^*$ and $\gamma \in \GF[4]{}^*$.
+Define $\alpha \in \GF[4]{}^*$ by $\alpha = \mulch[m_1]{a}$.
+The following equality holds:
+\begin{align}
+\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x + x^{-1}}}
+& = \left\{
+\begin{array}{ll}
+\frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma = \alpha$,} \\
+\frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) & \text{if $\gamma \neq \alpha$.}
+\end{array}
+\right. \label{eq:twistedkloo}
+\end{align}
+\end{proposition}
+
+\begin{proof}
 First remark that summing over the three possible values of $\gamma$ yields
 \begin{align*}
 \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{a x + x^{-1}}}
 & = K_{m_1}(a) - 1 \enspace .
 \end{align*}
 Moreover, making the change of variable $x = \left(a x\right)^{-1}$
-shows that the sum takes the same value for $\gamma$ and $\alpha^{-1} \gamma^{-1}$.
-In particular, it takes the same value for $\alpha \beta$ and $\alpha \beta^2$, that is for the elements of $\GF[4]{}^*$ different from $\alpha$.
+shows that the sum takes the same value for $\gamma$ and
+$\alpha^{-1} \gamma^{-1}$.
+In particular, it takes the same value for $\alpha \beta$ and $\alpha \beta^2$,
+where $\beta \in \GF[4]{}^*$ is a primitive third root of unity,
+that is for the elements of $\GF[4]{}^*$ different from $\alpha$,
+and it can be deduced value from the value for $\gamma = \alpha$.
 %For example, if $\alpha = 1$, that is if $a$ is a cube,
 %it means it takes the same value for $\gamma \in \{ \beta, \beta^2 \}$.
 %In any case, it is sufficient to determine the value of the sum for one value
@@ -916,28 +972,41 @@ In particular, it takes the same value for $\alpha \beta$ and $\alpha \beta^2$, 
 Denote by $r$ a square root of $a$.
 The change of variable $x = rx$ and properties of the Dickson polynomial $D_3$
 when $m_1$ is even show that for $\gamma = \alpha = \mulch[m_1]{r^{-1}}$:
-\begin{align}
+\begin{align*}
 \sum_{x \in \GF{m_1}^*, \mulch{x} = \alpha} \addch{\tr{m_1}{a x + x^{-1}}}
-& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{r \left( x + x^{-1} \right)}} \nonumber \\
+& = \sum_{x \in \GF{m_1}^*, \mulch{x} = 1} \addch{\tr{m_1}{r \left( x + x^{-1} \right)}}
+\\
 & = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{r \left( x^3 + x^{-3} \right)}} \nonumber \\
-& = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{r D_3(x + x^{-1})}} \nonumber \\
-%& = \frac{1}{3} \left(2 \sum_{t \in \T_{m_1}^0 \setminus \set{0, 1}} \addch{\tr{m_1}{r D_3(t)}} + 1\right) \nonumber \\
-& = \frac{1}{3} \left(2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{r D_3(t)}} - 1\right) \nonumber \\
-%& = \frac{1}{3} \left(2 \left( C_{m_1}(r, r) - \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r D_3(t)}} \right) - 1\right) \nonumber \\
-& = \frac{1}{3} \left(2 C_{m_1}(r, r) - 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r t}} - 1\right) \nonumber \\
-& = \frac{1}{3} \left(2 C_{m_1}(r, r) + K_{m_1}(r) - 1\right) \nonumber \\
-& = \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right) \enspace . \label{eqn:twistedklooeq}
-\end{align}
+& = \frac{1}{3} \sum_{x \in \GF{m_1}^*} \addch{\tr{m_1}{r D_3(x + x^{-1})}}
+\\
+%& = \frac{1}{3} \left(2 \sum_{t \in \T_{m_1}^0 \setminus \set{0, 1}} \addch{\tr{m_1}{r D_3(t)}} + 1\right)
+\\
+& = \frac{1}{3} \left(2 \sum_{t \in \T_{m_1}^0} \addch{\tr{m_1}{r D_3(t)}} - 1\right)
+\\
+%& = \frac{1}{3} \left(2 \left( C_{m_1}(r, r) - \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r D_3(t)}} \right) - 1\right)
+\\
+& = \frac{1}{3} \left(2 C_{m_1}(r, r) - 2 \sum_{t \in \T_{m_1}^1} \addch{\tr{m_1}{r t}} - 1\right)
+\\
+& = \frac{1}{3} \left(2 C_{m_1}(r, r) + K_{m_1}(r) - 1\right)
+\\
+& = \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right)
+\enspace .
+%\label{eq:twistedklooeq}
+\qedhere
+\end{align*}
+%
+%For $\gamma \neq \alpha$, one deduces:
+%\begin{align*}
+%\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x + x^{-1}}}
+%& = \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right)
+%\enspace .
+%%\label{eq:twistedklooneq}
+%\end{align*}
+\end{proof}
 
-For $\gamma \neq \alpha$, one deduces:
-\begin{align}
-\sum_{x \in \GF{m_1}^*, \mulch{x} = \gamma} \addch{\tr{m_1}{a x + x^{-1}}}
-& = \frac{1}{3} \left(- C_{m_1}(a, a) + K_{m_1}(a) - 1\right) \enspace . \label{eqn:twistedklooneq}
-\end{align}
-
-Gathering Equations~(\ref{eqn:twistedcubic}), (\ref{eqn:twistedklooeq}) and
-(\ref{eqn:twistedklooneq}) gives the following expressions for $\Snu[2]$.
-\begin{proposition}
+Equations~(\ref{eq:twistedcubic}) and (\ref{eq:twistedkloo}) give
+the following expression for $\Snu[2]$.
+\begin{theorem}
 For $\nu = 2$, $a \in \GF{m_1}^*$ and $b \in \GF[4]{}^*$,
 and $\omega \in \GF{m_1}^*$,
 let $\gamma = b \mulch[m_1]{w_2}$.
@@ -959,21 +1028,23 @@ Then the sum $\Snu[2]$ is
 \frac{1}{3} \left(-2^{m_2} + C_{m_1}(a, a) - K_{m_1}(a)\right)
 & \text{if $\gamma \neq \alpha$ and $\gamma \neq \alpha^{-1}$.}
 \end{array}
-\right. \\
-& = \frac{1}{3} \left(
-\left(2 - 3 \tr{2}{\alpha \gamma}\right) 2^{m_2}
-- \left(2 - 3 \tr{2}{\alpha^{-1} \gamma}\right) C_{m_1}(a, a)
-- K_{m_1}(a)
-\right) \enspace .
+\right.
+%\\
+%& = \frac{1}{3} \left(
+%\left(2 - 3 \tr{2}{\alpha \gamma}\right) 2^{m_2}
+%- \left(2 - 3 \tr{2}{\alpha^{-1} \gamma}\right) C_{m_1}(a, a)
+%- K_{m_1}(a)
+%\right)
+%\enspace .
 \end{align}
-\end{proposition}
+\end{theorem}
 
 Carlitz's results~\cite{MR544577} recalled in Section~\ref{sec:cubic}
 can be used to make the cubic sum $C_{m_1}(a, a)$ explicit.
 In the particular case where $K_{m_1}(a) \equiv 1 \pmod{3}$,
 which is equivalent to $C_{m_1}(a, a) = 0$ and implies that $a$ is a cube,
 the expression for $\Snu[2]$ gets very concise,
-as does Equation~(\ref{eqn:walshfull}) for the Walsh transform.
+as does Equation~(\ref{eq:walshfull}) for the Walsh transform.
 \begin{corollary}
 \label{crl:walshsubfield}
 For $\nu = 2$, $a \in \GF{m_1}^*$ with $K_{m_1}(a) \equiv 1 \pmod{3}$
@@ -988,15 +1059,16 @@ Then the sum $\Snu[2]$ is
 %- \frac{2^{m_2} + K_{m_1}(a)}{3} & \text{if $\gamma \neq 1$,}
 %\end{array}
 %\right. \nonumber \\
-%& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{\gamma}} \right) 2^{m_2-1} \enspace .
-& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \tr{2}{\gamma} 2^{m_2} \enspace .
+%& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \left( 1 - \addch{\tr{2}{\gamma}} \right) 2^{m_2-1}
+%\enspace ,
+& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} - \tr{2}{\gamma} 2^{m_2}
+\enspace .
 \end{align}
 and the Walsh transform at $\omega \neq 0$ is
 \begin{align}
 \Wa{f_{a,b}}(\omega)
 & = \addch{\tr{2}{\gamma}} 2^{m_1} + \frac{4 - K_{m_1}(a)}{3} \enspace .
 \end{align}
-
 \end{corollary}
 %\begin{proof}
 %\begin{align*}
@@ -1008,6 +1080,7 @@ and the Walsh transform at $\omega \neq 0$ is
 %\end{proof}
 Note that Corollary~\ref{crl:walshsubfield} shows that
 for $\omega \in \GF{m_1}^*$ the Walsh transform of $f_{a,b}$
+at $\omega$
 is that of a bent function if and only if $K_{m_1}(a) = 4$.
 
 \subsection{A conjectural general formula}
@@ -1017,33 +1090,42 @@ where $w_1 \neq 1$, \ie $\omega \in \GF{m_0}^*$.
 The main reason being that the multiplicative and additive characters
 of $\GF{m_1}$ act on different values, \eg
 $r = \tr[m_1]{m_0}{w_1 u_1}$, or $s = \tr[m_1]{m_0}{w_1^{-1} u_1}$,
-and $t = \tr[m_1]{m_0}{u_1}$.
+for one of them,
+and $t = \tr[m_1]{m_0}{u_1}$
+for the other one.
 Considering $v = \tr[m_1]{m_0}{w_1}$, these values are related by $r + s = v t$.
 Moreover, the sum $\Snu[2]$ takes the same value for $w_1$ and $w_1^{-1}$,
 so there is hope to introduce enough symmetry to reduce the case $w_1 \neq 1$
 to the case $w_1 = 1$.
-Unfortunately we could not devise a way to do so.
+Unfortunately, we could not devise a way to do so.
 
-Yet, experimental evidence suggests the following conjecture
-which relates the value of the Walsh transform at $w_1 = 1$ and $w_1 \neq 1$.
+Yet, experimental evidence presented in more details in
+Section~\ref{sec:expdata} suggests that the following conjecture,
+which relates the value of $\Snu[2]$ for $w_1 = 1$ and $w_1 \neq 1$,
+is true.
 \begin{conjecture}
 \label{cnj:walshconj}
 For $\nu = 2$, $a \in \GF{m_1}^*$ with $K_{m_1}(a) \equiv 1 \pmod{3}$
 and $b \in \GF[4]{}^*$, and $\omega \in \GF{m_0}^*$,
 let $\gamma = b \mulch[m_1]{w_2}$.
-Then there exists a Boolean function $h(a, b, w_1, w_2)$ such that
+There exists a Boolean function $\mystery$ such that
 the sum $\Snu[2]$ is
-\begin{align*}
+\begin{align}
 \Snu[2]
-& = \frac{2^{m_2+1} - K_{m_1}(a)}{3} \nonumber \\
-& \qquad + 2 \tr{m_0}{a w_1^2} \frac{2^{m_2+1} - 1}{3}  \nonumber \\
-& \qquad - \mystery \addch{\tr{m_0}{a w_1^2}} 2^{m_2}
+%& = \frac{2^{m_2+1} - K_{m_1}(a)}{3}
+%\nonumber \\
+%& \qquad - 2 \tr{m_0}{a w_1^2} \frac{2^{m_2+1} - 1}{3}
+%\nonumber \\
+%& \qquad - \mystery \addch{\tr{m_0}{a w_1^2}} 2^{m_2}
+& = \frac{2^{m_2+1} - K_{m_1}(a)}{3}
+- 2 f_a(w_1^{-1}) \frac{2^{m_2+1} - 1}{3}
+- \mystery \addch{f_a(w_1^{-1})} 2^{m_2}
 \enspace .
-\end{align*}
+\end{align}
 The Walsh transform at $\omega \neq 0$ is then
 \begin{align}
 \Wa{f_{a,b}}(\omega)
-& = 2^{m_1} \addch{\mystery} + \frac{4 - K_{m_1}(a)}{3} \enspace .
+& = \addch{\mystery f_a(w_1^{-1})} 2^{m_1} + \frac{4 - K_{m_1}(a)}{3} \enspace .
 \end{align}
 \end{conjecture}
 In particular, this conjecture implies Conjecture~\ref{cnj:kloofour}:
@@ -1052,6 +1134,7 @@ if $K_{m_1}(a) = 4$, then $f_{a,b}$ is bent.
 when $\omega \in \GF{m_1}^*$.)
 
 \subsection{Experimental data}
+\label{sec:expdata}
 
 The computation of $\Snu[2]$ was implemented in C and assembly\footnote{%
 The source code is available at
@@ -1083,6 +1166,7 @@ has time complexity $\tilde{O}(2^{3 m_1})$ which quickly becomes overcostly
 (and is comparable to that of computing the Walsh spectrum
 for every cyclotomic class of $a \in \GF{m_1}^*$ which has time complexity
 $\tilde{O}(2^{3 m_1})$ as well but space complexity $\tilde{O}(2^{m_1})$).
+
 Still, we checked Conjecture~\ref{cnj:walshconj}
 \begin{itemize}
 \item completely for $m_2 = 3, 5, 7, 9$,
@@ -1094,14 +1178,15 @@ Finally, assuming $K_{m_1}(a) \equiv 1 \pmod{3}$
 and Conjecture~\ref{cnj:walshconj} is correct,
 Parseval's equality yields the following relation:
 \begin{align*}
-\sum_{x \in \GF{m_0}^*} \addch{\mystery}
+\sum_{x \in \GF{m_0}^*} \addch{\mystery f_a(w_1^{-1})}
 & = \frac{2^{m_1} - 1}{3} \left( K_{m_1}(a) - 1 \right) \\
 & = \Wa{f_{a,b}}(0) - 1 \enspace .
 \end{align*}
 This is supported by experimental evidence that
 there are exactly $2^{m_1 - 1} + (5/6) \left(K_{m_1}(a) - 4\right) + 3$
-(respectively $2^{m_1 - 1} - (1/6)\left(K_{m_1}(a) - 4\right)$) values of $w_1 \in U_1$
-such that $\mystery$ is zero when $\gamma = 1$
+(respectively $2^{m_1 - 1} - (1/6)\left(K_{m_1}(a) - 4\right)$)
+values of $w_1 \in U_1$
+such that $\mystery f_a(w_1^{-1})$ is zero when $\gamma = 1$
 (respectively $\gamma \neq 1$).
 
 \section{Further research and open problems}
@@ -1113,7 +1198,7 @@ and in this note.
 Otherwise, more involved techniques could be tried, \eg considering a whole
 family of sums as a whole and their geometric structure.
 Another posibility would be to directly treat the general Gauss sums of
-Equations~(\ref{eqn:gengauss}) and~(\ref{eqn:gauss}) without focussing
+Equations~(\ref{eq:gengauss}) and~(\ref{eq:gauss}) without focussing
 on the case $\nu = 2$.
 
 \bibliographystyle{plain}

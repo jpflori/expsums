@@ -174,18 +174,18 @@ $\mulch[n]{}$ is a cubic multiplicative character
 and $\addch{}$ a quadratic additive character.
 
 In the case of extensions of degree four times an odd number,
-that is when $m$ is twice an odd number,
-an explicit formula involving the Kloosterman sum $K_m(a)$ is proved
-for $\omega$ lying in the subfield $\GF{2m}$,
+that is when $n$ is four times an odd number $m$,
+an explicit formula involving the Kloosterman sum $K_{n/2}(a)$ is proved
+for $\omega$ lying in the subfield $\GF{n/2}$,
 and conjectured and supported by extensive experimental evidence
-when $\omega \in \GF{4m}$.
+when $\omega \in \GF{n}$.
 In particular, the validity of this formula would prove the following
 conjecture for extensions of degree four times an odd number
 (and give hope to prove the conjecture for $n$ of any $2$-adic valuation):
 \begin{conjecture}%[\cite{DBLP:journals/dcc/Mesnager11,DBLP:journals/tit/Mesnager11}]
 \label{cnj:kloofour}
-Let $n = 4m$ with $m$ odd, $a \in \GF{2m}^*$ and $b \in \GF[4]{}^*$.
-The function $f_{a,b}$ is bent if and only if $K_{m_1}(a) = 4$.
+Let $n = 4m$ with $m$ odd, $a \in \GF{n/2}^*$ and $b \in \GF[4]{}^*$.
+The function $f_{a,b}$ is bent if and only if $K_{n/2}(a) = 4$.
 \end{conjecture}
 
 \section{Notation}
@@ -255,10 +255,10 @@ We denote by $D_3$ the third Dickson polynomial of the first kind
 $D_3(x) = x^3 + x$.
 \end{definition}
 
-A notable property~\cite[Propositions~5, 6 and Theorem~7]{DBLP:journals/ffa/DillonD04}
-of $D_3$ is that $D_3(x + x^{-1}) = x^3 + x^{-3}$.
+A notable property of $D_3$ is that $D_3(x + x^{-1}) = x^3 + x^{-3}$.
 It implies in particular that $D_3$ induces a permutation of $\T_{m_1}^0$
-when $m_1$ is odd and of $\T_{m_1}^1$ when $m_1$ is even.
+when $m_1$ is odd and of $\T_{m_1}^1$ when $m_1$ is
+even~\cite[Propositions~5, 6 and Theorem~7]{DBLP:journals/ffa/DillonD04}.
 
 \subsection{Characters}
 \label{sec:characters}
@@ -352,19 +352,19 @@ Charpin \etal later deduced that both in the odd case~\cite{DBLP:journals/jct/Ch
 and in the even case~\cite{4595463,DBLP:journals/dm/CharpinHZ09}
 these conditions are equivalent to $K_{m_1}(a) \equiv 1 \pmod{3}$.
 
-%For completeness, the other possible values for $C_{m_1}(a, a)$ when $m_1$ is even follow:
-%\begin{itemize}
-%\item When $a$ is a cube and $\tr[2]{m_1}{\alpha} = 0$,
-%then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
-%where $u_0$ is any solution to $u^4 + u = \alpha^4$,
-%that is $u_0 = \sum_{i=0}^{(m_2-3)/2} \alpha^{4^{2*i+2}} + \gamma$
-%for any $\gamma \in \GF[4]{}$.
-%\item When $a$ is not a cube,
-%then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
-%where $u_0$ is the unique solution to $u^4 + u / a = 1$,
-%that is $u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-%%$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
-%\end{itemize}
+For completeness, the other possible values for $C_{m_1}(a, a)$ when $m_1$ is even follow:
+\begin{itemize}
+\item When $a$ is a cube and $\tr[2]{m_1}{\alpha} = 0$,
+then $C_{m_1}(a, a) = 2^{m_2 + 1} \addch{\tr{m_1}{u_0^3}}$,
+where $u_0$ is any solution to $u^4 + u = \alpha^4$,
+that is $u_0 = \sum_{i=0}^{(m_2-3)/2} \alpha^{4^{2*i+2}} + \gamma$
+for any $\gamma \in \GF[4]{}$.
+\item When $a$ is not a cube,
+then $C_{m_1}(a, a) = - 2^{m_2} \addch{\tr{m_1}{a u_0^3}}$,
+where $u_0$ is the unique solution to $u^4 + u / a = 1$,
+that is $u_0 = \mulch{a} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+%$u_0 = a^{(4^{m_2}-1)/3} \sum_{i = 0}^{m_2-1} a^{4^i} a^{(4^i - 1)/3}$.
+\end{itemize}
 
 Finally, Carlitz also proved the following result on $C_{m_1}(a, 0)$ when $m_1 = 2 m_2$ is even:
 \begin{align*}
@@ -397,7 +397,7 @@ $g_b(x) = \tr{2}{b \mulch[m_0]{x}}$.
 \subsection{Field of definition of the coefficients}
 
 First notice that it is enough to know how to evaluate the Walsh transform of
-functions $f_{a,b}$ for $a \in \GF{m_1}^*$ to extend results to $a \in \GF{m_0}^*$.
+functions $f_{a,b}$ for $a \in \GF{m_1}^*$.
 \begin{lemma}
 Let $a \in \GF{m_0}^*$ be written as $a = \alpha \tilde{a}$
 with $\alpha \in U_1$ and $\tilde{a} \in \GF{m_1}^*$
@@ -675,7 +675,7 @@ $\sum_{u \in U, \tr[m_\nu]{m_0}{\omega u} = 0} \addch{f_{a,b}(u)} = \sum_{i = 1}
 \end{align*}
 
 The first sum $\sigma_1$
-%has to be dealt with indenpendently and
+%has to be dealt with independently and
 can be simplified as Equation~(\ref{eq:sumfab}):
 \begin{align}
 \sigma_1
@@ -817,7 +817,7 @@ lead to the following expression for the Walsh transform at $\omega \neq 0$:
 & \qquad + 2^{m_\nu + 1} S_\nu(a, b, \omega)
 \enspace ,
 \end{align*}
-which gives the announced expression by gathering indenpendently
+which gives the announced expression by gathering independently
 the terms in $\addch{f_a(w_1^{-1})}$ and $(1 - K_{m_1}(a))$.
 \end{proof}
 
@@ -868,8 +868,7 @@ Then
 
 \begin{proof}
 As $w_1 = 1$, both the multiplicative and additive characters act
-on the the same inputs so that,
-after making the change of variable $u_1 = u_1 w_1$,
+on the the same inputs so that
 we can use the function $u_1 \mapsto u_1 + u_1^{-1}$
 to transform the sum over $U_1$ of Equation~(\ref{eq:fourgauss})
 into a sum over $\T_{m_1}^1$:
@@ -962,7 +961,8 @@ $\alpha^{-1} \gamma^{-1}$.
 In particular, it takes the same value for $\alpha \beta$ and $\alpha \beta^2$,
 where $\beta \in \GF[4]{}^*$ is a primitive third root of unity,
 that is for the elements of $\GF[4]{}^*$ different from $\alpha$,
-and it can be deduced value from the value for $\gamma = \alpha$.
+and this value can be deduced from the value for $\gamma = \alpha$
+which we now compute.
 %For example, if $\alpha = 1$, that is if $a$ is a cube,
 %it means it takes the same value for $\gamma \in \{ \beta, \beta^2 \}$.
 %In any case, it is sufficient to determine the value of the sum for one value

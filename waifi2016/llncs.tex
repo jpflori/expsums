@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass{llncs}
 
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -24,15 +24,15 @@
 \newcommand{\eg}{e.g.\@\xspace}
 \newcommand{\etal}{et al.\@\xspace}
 
-\usepackage{amsthm}
-\newtheorem{theorem}{Theorem}%[section]
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{remark}[theorem]{Remark}
-\newtheorem{example}[theorem]{Example}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{conjecture}[theorem]{Conjecture}
+%\usepackage{amsthm}
+%\newtheorem{theorem}{Theorem}%[section]
+%\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{remark}[theorem]{Remark}
+%\newtheorem{example}[theorem]{Example}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{conjecture}[theorem]{Conjecture}
 
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -69,12 +69,11 @@
 }
 
 \title{A conjecture about Gauss sums and bentness of binomial Boolean functions}
-
-\author{Jean-Pierre Flori
-  \thanks{ANSSI (Agence nationale de la sécurité des systèmes d'information),
-    51, boulevard de La Tour-Maubourg,
-    75700 Paris 07 SP, France.
-    \texttt{jean-pierre.flori@ssi.gouv.fr}}
+\author{Jean-Pierre Flori}%\inst{1}}
+\institute{Agence nationale de la sécurité des systèmes d'information\\
+51, boulevard de La Tour-Maubourg,\\
+75700 Paris 07 SP, France.\\
+\email{jean-pierre.flori@ssi.gouv.fr}
 }
 
 %\date{\today~--~\currenttime}
@@ -419,7 +418,7 @@ so that
 \Wa{f_{a,b}}(\omega) & = \sum_{x \in \GF{m_0}} \addch{f_{a,b}(x) + \tr{m_0}{\omega x}} \\
 & = \sum_{x \in \GF{m_0}} \addch{f_{a,b}(\tilde{\alpha} x) + \tr{m_0}{\omega \tilde{\alpha} x}} \\
 & = \sum_{x \in \GF{m_0}} \addch{f_{\tilde{a},\beta b}(x) + \tr{m_0}{\omega \tilde{\alpha} x}} \\
-& = \Wa{f_{\tilde{a},\beta b}}(\tilde{\alpha} \omega) \enspace . \qedhere
+& = \Wa{f_{\tilde{a},\beta b}}(\tilde{\alpha} \omega) \enspace . %\qedhere
 \end{align*}
 \end{proof}
 From now on we can suppose that $a \in \GF{m_1}^*$ without loss of generality.
@@ -552,7 +551,7 @@ one deduces that for $b \neq 1$:
 \begin{align*}
 \Snu[1]
 & = \frac{1}{3} \left( 1 - K_{m_1}(a) - C_{m_1}(a, a) \right) \enspace .
-\qedhere
+%\qedhere
 \end{align*}
 \end{proof}
 
@@ -602,7 +601,7 @@ Finally, using the identity $\left( 2^{2^j m_\nu} + 1 \right) \left( 2^{2^j m_\n
 & = \prod_{j=2}^{\nu} \left( 2^{2^{\nu-j} m_\nu}+1 \right)
 = \frac{2^{2^{\nu-1} m_\nu} - 1}{2^{m_\nu} - 1}
 \enspace .
-\qedhere
+%\qedhere
 \end{align*}
 \end{proof}
 
@@ -882,7 +881,7 @@ into a sum over $\T_{m_1}^1$:
 \\
 & = 2 \sum_{t \in \T_{m_1}^1, \mulch[m_1]{t} = b \mulch[m_1]{w_2}} \addch{\tr{m_1}{a t}}
 \enspace .
-\qedhere
+%\qedhere
 \end{align*}
 \end{proof}
 
@@ -992,7 +991,7 @@ when $m_1$ is even show that for $\gamma = \alpha = \mulch[m_1]{r^{-1}}$:
 & = \frac{1}{3} \left(2 C_{m_1}(a, a) + K_{m_1}(a) - 1\right)
 \enspace .
 %\label{eq:twistedklooeq}
-\qedhere
+%\qedhere
 \end{align*}
 %
 %For $\gamma \neq \alpha$, one deduces:
@@ -1201,7 +1200,7 @@ Another posibility would be to directly treat the general Gauss sums of
 Equations~(\ref{eq:gengauss}) and~(\ref{eq:gauss}) without focussing
 on the case $\nu = 2$.
 
-\bibliographystyle{plain}
-\bibliography{even}
+\bibliographystyle{splncs}
+\bibliography{llncs}
 
 \end{document}
